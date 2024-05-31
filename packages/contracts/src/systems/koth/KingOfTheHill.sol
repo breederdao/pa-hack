@@ -64,6 +64,10 @@ contract KingOfTheHill is System {
         uint256 lastClaimedTime = kingOfTheHillStatusData.lastClaimedTime;
         require(lastClaimedTime + duration < block.timestamp, "KingOfTheHill.claimKing: game has ended");
 
+        // king cannot reclaim
+        address king = kingOfTheHillStatusData.king;
+        require(msg.sender != king, "KingOfTheHill.claimKing: already king");
+
         // setting startTime if it does not exist
         uint256 startTime;
         if(kingOfTheHillStatusData.startTime == 0) {
@@ -95,7 +99,7 @@ contract KingOfTheHill is System {
         _inventoryLib().ephemeralToInventoryTransfer(_smartObjectId, inItems);
 
         // updating status
-        KingOfTheHillStatus.set(_smartObjectId, msg.sender, startTime, block.timestamp, updatedItemCount);
+        KingOfTheHillStatus.set(_smartObjectId, msg.sender, startTime, block.timestamp, updatedItemCount, false);
     }
 
     function claimPrize(uint256 _smartObjectId) public {
@@ -109,23 +113,23 @@ contract KingOfTheHill is System {
         // giving item to user
         uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
         uint256 totalItemCount = kingOfTheHillStatusData.totalItemCount;
-        
-        EntityRecordTableData memory itemInEntity = EntityRecordTable.get(
+        EntityRecordTableData memory itemOutEntity = EntityRecordTable.get(
             _namespace().entityRecordTableId(),
             expectedItemId
         );
-        
-        InventoryItem[] memory inItems = new InventoryItem[](1);
-        inItems[0] = InventoryItem(
+        InventoryItem[] memory outItems = new InventoryItem[](1);
+        outItems[0] = InventoryItem(
             expectedItemId,
             msg.sender,
-            itemInEntity.typeId,
-            itemInEntity.itemId,
-            itemInEntity.volume,
+            itemOutEntity.typeId,
+            itemOutEntity.itemId,
+            itemOutEntity.volume,
             totalItemCount
         );
+        _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
 
-        // reset item
+        // updating status to claimed
+        KingOfTheHillStatus.setClaimed(_smartObjectId, true);
     }
 
     function _inventoryLib() internal view returns (InventoryLib.World memory) {

@@ -24,7 +24,7 @@ ResourceId constant _tableId = ResourceId.wrap(0x746262644172656e610000000000000
 ResourceId constant KingOfTheHillStatusTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(
-  0x0074040014202020000000000000000000000000000000000000000000000000
+  0x0075050014202020010000000000000000000000000000000000000000000000
 );
 
 struct KingOfTheHillStatusData {
@@ -32,6 +32,7 @@ struct KingOfTheHillStatusData {
   uint256 startTime;
   uint256 lastClaimedTime;
   uint256 totalItemCount;
+  bool claimed;
 }
 
 library KingOfTheHillStatus {
@@ -59,11 +60,12 @@ library KingOfTheHillStatus {
    * @return _valueSchema The value schema for the table.
    */
   function getValueSchema() internal pure returns (Schema) {
-    SchemaType[] memory _valueSchema = new SchemaType[](4);
+    SchemaType[] memory _valueSchema = new SchemaType[](5);
     _valueSchema[0] = SchemaType.ADDRESS;
     _valueSchema[1] = SchemaType.UINT256;
     _valueSchema[2] = SchemaType.UINT256;
     _valueSchema[3] = SchemaType.UINT256;
+    _valueSchema[4] = SchemaType.BOOL;
 
     return SchemaLib.encode(_valueSchema);
   }
@@ -82,11 +84,12 @@ library KingOfTheHillStatus {
    * @return fieldNames An array of strings with the names of value fields.
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
-    fieldNames = new string[](4);
+    fieldNames = new string[](5);
     fieldNames[0] = "king";
     fieldNames[1] = "startTime";
     fieldNames[2] = "lastClaimedTime";
     fieldNames[3] = "totalItemCount";
+    fieldNames[4] = "claimed";
   }
 
   /**
@@ -272,6 +275,48 @@ library KingOfTheHillStatus {
   }
 
   /**
+   * @notice Get claimed.
+   */
+  function getClaimed(uint256 smartObjectId) internal view returns (bool claimed) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    return (_toBool(uint8(bytes1(_blob))));
+  }
+
+  /**
+   * @notice Get claimed.
+   */
+  function _getClaimed(uint256 smartObjectId) internal view returns (bool claimed) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    return (_toBool(uint8(bytes1(_blob))));
+  }
+
+  /**
+   * @notice Set claimed.
+   */
+  function setClaimed(uint256 smartObjectId, bool claimed) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((claimed)), _fieldLayout);
+  }
+
+  /**
+   * @notice Set claimed.
+   */
+  function _setClaimed(uint256 smartObjectId, bool claimed) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    StoreCore.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((claimed)), _fieldLayout);
+  }
+
+  /**
    * @notice Get the full data.
    */
   function get(uint256 smartObjectId) internal view returns (KingOfTheHillStatusData memory _table) {
@@ -309,9 +354,10 @@ library KingOfTheHillStatus {
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
-    uint256 totalItemCount
+    uint256 totalItemCount,
+    bool claimed
   ) internal {
-    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount);
+    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount, claimed);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -330,9 +376,10 @@ library KingOfTheHillStatus {
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
-    uint256 totalItemCount
+    uint256 totalItemCount,
+    bool claimed
   ) internal {
-    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount);
+    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount, claimed);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -351,7 +398,8 @@ library KingOfTheHillStatus {
       _table.king,
       _table.startTime,
       _table.lastClaimedTime,
-      _table.totalItemCount
+      _table.totalItemCount,
+      _table.claimed
     );
 
     PackedCounter _encodedLengths;
@@ -371,7 +419,8 @@ library KingOfTheHillStatus {
       _table.king,
       _table.startTime,
       _table.lastClaimedTime,
-      _table.totalItemCount
+      _table.totalItemCount,
+      _table.claimed
     );
 
     PackedCounter _encodedLengths;
@@ -388,7 +437,11 @@ library KingOfTheHillStatus {
    */
   function decodeStatic(
     bytes memory _blob
-  ) internal pure returns (address king, uint256 startTime, uint256 lastClaimedTime, uint256 totalItemCount) {
+  )
+    internal
+    pure
+    returns (address king, uint256 startTime, uint256 lastClaimedTime, uint256 totalItemCount, bool claimed)
+  {
     king = (address(Bytes.slice20(_blob, 0)));
 
     startTime = (uint256(Bytes.slice32(_blob, 20)));
@@ -396,6 +449,8 @@ library KingOfTheHillStatus {
     lastClaimedTime = (uint256(Bytes.slice32(_blob, 52)));
 
     totalItemCount = (uint256(Bytes.slice32(_blob, 84)));
+
+    claimed = (_toBool(uint8(Bytes.slice1(_blob, 116))));
   }
 
   /**
@@ -409,7 +464,9 @@ library KingOfTheHillStatus {
     PackedCounter,
     bytes memory
   ) internal pure returns (KingOfTheHillStatusData memory _table) {
-    (_table.king, _table.startTime, _table.lastClaimedTime, _table.totalItemCount) = decodeStatic(_staticData);
+    (_table.king, _table.startTime, _table.lastClaimedTime, _table.totalItemCount, _table.claimed) = decodeStatic(
+      _staticData
+    );
   }
 
   /**
@@ -440,9 +497,10 @@ library KingOfTheHillStatus {
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
-    uint256 totalItemCount
+    uint256 totalItemCount,
+    bool claimed
   ) internal pure returns (bytes memory) {
-    return abi.encodePacked(king, startTime, lastClaimedTime, totalItemCount);
+    return abi.encodePacked(king, startTime, lastClaimedTime, totalItemCount, claimed);
   }
 
   /**
@@ -455,9 +513,10 @@ library KingOfTheHillStatus {
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
-    uint256 totalItemCount
+    uint256 totalItemCount,
+    bool claimed
   ) internal pure returns (bytes memory, PackedCounter, bytes memory) {
-    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount);
+    bytes memory _staticData = encodeStatic(king, startTime, lastClaimedTime, totalItemCount, claimed);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -473,5 +532,17 @@ library KingOfTheHillStatus {
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
     return _keyTuple;
+  }
+}
+
+/**
+ * @notice Cast a value to a bool.
+ * @dev Boolean values are encoded as uint8 (1 = true, 0 = false), but Solidity doesn't allow casting between uint8 and bool.
+ * @param value The uint8 value to convert.
+ * @return result The boolean value.
+ */
+function _toBool(uint8 value) pure returns (bool result) {
+  assembly {
+    result := value
   }
 }

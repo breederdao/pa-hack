@@ -30,7 +30,7 @@ export default mudConfig({
         startTime: "uint256", // to calculate total running time
         lastClaimedTime: "uint256",
         totalItemCount: "uint256", // total pot
-        // claimed: "bool"
+        claimed: "bool"
       },
     }
   },
