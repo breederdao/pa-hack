@@ -1,0 +1,24 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1,
+    "workspacePrefix": "/Users/arkboard/breeder/pa-hack"
+  },
+  "1 error pnpm": {
+    "code": "ERR_PNPM_UNSUPPORTED_ENGINE",
+    "packageId": "/Users/arkboard/breeder/pa-hack",
+    "wanted": {
+      "node": "^18",
+      "pnpm": "^8 || ^9"
+    },
+    "current": {
+      "node": "v16.15.0",
+      "pnpm": "6.11.0"
+    },
+    "err": {
+      "name": "Error",
+      "message": "Unsupported engine for /Users/arkboard/breeder/pa-hack: wanted: {\"node\":\"^18\",\"pnpm\":\"^8 || ^9\"} (current: {\"node\":\"v16.15.0\",\"pnpm\":\"6.11.0\"})",
+      "code": "ERR_PNPM_UNSUPPORTED_ENGINE",
+      "stack": "Error: Unsupported engine for /Users/arkboard/breeder/pa-hack: wanted: {\"node\":\"^18\",\"pnpm\":\"^8 || ^9\"} (current: {\"node\":\"v16.15.0\",\"pnpm\":\"6.11.0\"})\n    at Object.checkEngine [as default] (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:35213:16)\n    at Object.checkPackage (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:35357:99)\n    at Object.packageIsInstallable (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:35381:44)\n    at Object.readProjectManifestOnly (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:40507:30)\n    at async Object.handler (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:121554:24)\n    at async /Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:125614:20\n    at async run (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:125589:34)\n    at async runPnpm (/Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:125799:5)\n    at async /Users/arkboard/.node/corepack/pnpm/6.11.0/dist/pnpm.cjs:125791:7"
+    }
+  }
+}
