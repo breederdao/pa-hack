@@ -5,7 +5,7 @@ import MainButton from './components/buttons/MainButton';
 export const App = () => {
 
   return (
-    <Container title='Area Control'>
+    <Container title='King of the Hill'>
       <div className='border-[1px] border-dusty-orange mb-6'>
         <h3 className="text-walnut text-base leading-6 font-normal text-center">Prize pool</h3>
         <h2 className='text-dusty-orange font-normal text-3xl leading-[38px] text-center border-b-2 border-dusty-orange'>1 Frontier Chip/s</h2>
