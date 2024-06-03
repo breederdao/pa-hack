@@ -52,6 +52,9 @@ contract KingOfTheHill is System {
             );
         }
 
+        // adding limit so people have to deposit after every claim to make sure they're present
+        _inventoryLib().setInventoryCapacity(_smartObjectId, 20);
+
         KingOfTheHillConfig.set(_smartObjectId, _duration, _expectedItemId, _expectedItemIncrement, uint256(0));
     }
 
@@ -109,6 +112,9 @@ contract KingOfTheHill is System {
         // make sure king is claiming
         address king = kingOfTheHillStatusData.king;
         require(msg.sender == king, "KingOfTheHill.claimPrize: must be king");
+
+        // make sure not yet claimed
+        require(!kingOfTheHillStatusData.claimed, "KingOfTheHill.claimPrize: already claimed");
 
         // giving item to user
         uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
