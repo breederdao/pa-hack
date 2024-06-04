@@ -210,7 +210,7 @@ contract KingOfTheHill is System {
             _smartObjectId
         );
 
-        require(msg.sender == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
+        require(_msgSender() == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
 
         // seeding initial value
         uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
