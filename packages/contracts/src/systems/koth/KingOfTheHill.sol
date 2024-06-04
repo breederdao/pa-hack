@@ -23,8 +23,6 @@ import { Utils as InventoryUtils } from "@eveworld/world/src/modules/inventory/U
 import { Utils as SmartDeployableUtils } from "@eveworld/world/src/modules/smart-deployable/Utils.sol";
 import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@eveworld/common-constants/src/constants.sol";
 
-import { InventoryInteract } from "@eveworld/world/src/modules/inventory/system/InventoryInteract.sol";
-
 import { KingOfTheHillConfig, KingOfTheHillConfigData } from "../../codegen/tables/KingOfTheHillConfig.sol";
 import { KingOfTheHillStatus, KingOfTheHillStatusData } from "../../codegen/tables/KingOfTheHillStatus.sol";
 
@@ -33,6 +31,20 @@ contract KingOfTheHill is System {
     using EntityRecordUtils for bytes14;
     using InventoryUtils for bytes14;
     using SmartDeployableUtils for bytes14;
+
+    modifier onlySSUOwner(uint256 _smartObjectId) {
+        address ssuOwner = IERC721(
+            DeployableTokenTable.getErc721Address(
+                _namespace().deployableTokenTableId()
+            )
+        ).ownerOf(_smartObjectId);
+
+        require(
+            _msgSender() == ssuOwner,
+            "KingOfTheHill: only SSU owner can call this function"
+        );
+        _;
+    }
 
     // add access control
     function setKingOfTheHillConfig(
@@ -157,7 +169,6 @@ contract KingOfTheHill is System {
                 _smartObjectId
             );
 
-        // make sure king is claiming
         address king = kingOfTheHillStatusData.king;
         require(_msgSender() == king, "KingOfTheHill.claimPrize: must be king");
 
