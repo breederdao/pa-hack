@@ -22,4 +22,18 @@ interface IKingOfTheHill {
   function action__claimPrize(uint256 _smartObjectId, uint256 _resetTime) external;
 
   function action__resetGame(uint256 _smartObjectId, uint256 _initItemQuantity) external;
+
+  function action__getCurrentStatusData(
+    uint256 _smartObjectId
+  )
+    external
+    view
+    returns (address king, uint256 startTime, uint256 lastClaimedTime, uint256 totalItemCount, bool claimed);
+
+  function action__getConfigData(
+    uint256 _smartObjectId
+  )
+    external
+    view
+    returns (uint256 duration, uint256 expectedItemId, uint256 expectedItemIncrement, uint256 lastResetTime);
 }

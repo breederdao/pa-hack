@@ -277,7 +277,7 @@ contract KingOfTheHill is System {
         // get lastResetTime for game id purposes
         uint256 lastResetTime = kingOfTheHillConfigData.lastResetTime;
 
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
+        return KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
     }
 
     function getCurrentStatusData(uint256 _smartObjectId) public view returns (
