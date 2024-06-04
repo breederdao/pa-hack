@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'action',
+  namespace: 'king',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',

@@ -32,13 +32,7 @@ contract KingOfTheHill is System {
     using InventoryUtils for bytes14;
     using SmartDeployableUtils for bytes14;
 
-    // add access control
-    function setKingOfTheHillConfig(
-        uint256 _smartObjectId,
-        uint256 _duration,
-        uint256 _expectedItemId,
-        uint256 _expectedItemIncrement
-    ) public {
+    modifier onlySSUOwner(uint256 _smartObjectId) {
         address ssuOwner = IERC721(
             DeployableTokenTable.getErc721Address(
                 _namespace().deployableTokenTableId()
@@ -49,6 +43,16 @@ contract KingOfTheHill is System {
             _msgSender() == ssuOwner,
             "KingOfTheHill.setKingOfTheHillConfig: not owned"
         );
+        _;
+    }
+
+    // add access control
+    function setKingOfTheHillConfig(
+        uint256 _smartObjectId,
+        uint256 _duration,
+        uint256 _expectedItemId,
+        uint256 _expectedItemIncrement
+    ) public onlySSUOwner(_smartObjectId) {
 
         // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
@@ -63,9 +67,6 @@ contract KingOfTheHill is System {
                 _expectedItemId
             );
         }
-
-        // adding limit so people have to deposit after every claim to make sure they're present
-        _inventoryLib().setInventoryCapacity(_smartObjectId, 20);
 
         KingOfTheHillConfig.set(
             _smartObjectId,
@@ -166,7 +167,6 @@ contract KingOfTheHill is System {
                 resetTime
             );
 
-        // make sure king is claiming
         address king = kingOfTheHillStatusData.king;
         require(_msgSender() == king, "KingOfTheHill.claimPrize: must be king");
 
@@ -210,7 +210,7 @@ contract KingOfTheHill is System {
             _smartObjectId
         );
 
-        require(msg.sender == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
+        require(_msgSender() == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
 
         // seeding initial value
         uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
