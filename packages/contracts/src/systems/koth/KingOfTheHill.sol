@@ -246,6 +246,9 @@ contract KingOfTheHill is System {
         // setting resetTime as game id proxy
         uint256 resetTime = block.timestamp;
         KingOfTheHillConfig.setLastResetTime(_smartObjectId, resetTime);
+
+        // adding init value for pool
+        KingOfTheHillStatus.setTotalItemCount(_smartObjectId, resetTime, _initItemQuantity);
         
         // moving status setting to reset
         KingOfTheHillStatus.setLastClaimedTime(
@@ -279,5 +282,48 @@ contract KingOfTheHill is System {
 
     function _namespace() internal pure returns (bytes14 namespace) {
         return DEPLOYMENT_NAMESPACE;
+    }
+
+    function getCurrentStatus(uint256 _smartObjectId) internal view returns (KingOfTheHillStatusData memory) {
+        KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
+
+        // get lastResetTime for game id purposes
+        uint256 lastResetTime = kingOfTheHillConfigData.lastResetTime;
+
+        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
+    }
+
+    function getCurrentStatusData(uint256 _smartObjectId) public view returns (
+        address king, 
+        uint256 startTime, 
+        uint256 lastClaimedTime, 
+        uint256 totalItemCount, 
+        bool claimed
+    ) {
+        KingOfTheHillStatusData memory kingOfTheHillStatusData = getCurrentStatus(_smartObjectId);
+
+        return (
+            kingOfTheHillStatusData.king,
+            kingOfTheHillStatusData.startTime,
+            kingOfTheHillStatusData.lastClaimedTime,
+            kingOfTheHillStatusData.totalItemCount,
+            kingOfTheHillStatusData.claimed
+        );
+    }
+
+    function getConfigData(uint256 _smartObjectId) public view returns (
+        uint256 duration,
+        uint256 expectedItemId,
+        uint256 expectedItemIncrement,
+        uint256 lastResetTime
+    ) {
+        KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
+
+        return (
+            kingOfTheHillConfigData.duration,
+            kingOfTheHillConfigData.expectedItemId,
+            kingOfTheHillConfigData.expectedItemIncrement,
+            kingOfTheHillConfigData.lastResetTime
+        );
     }
 }
