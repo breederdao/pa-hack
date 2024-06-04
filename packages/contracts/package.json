@@ -12,6 +12,7 @@
     "setup-koth": "source ./.env && pnpm forge script script/SetKingOfTheHillConfig.s.sol:SetKingOfTheHillConfig --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "claim-king": "source ./.env && pnpm forge script script/ClaimKing.s.sol:ClaimKing --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "claim-prize": "source ./.env && pnpm forge script script/ClaimPrize.s.sol:ClaimPrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "reset-game": "source ./.env && pnpm forge script script/ResetGame.s.sol:ResetGame --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "release-prize": "source ./.env && pnpm forge script script/ReleasePrize.s.sol:ReleasePrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "lint": "pnpm run prettier && pnpm run solhint",
     "prettier": "prettier --write 'src/**/*.sol'",
