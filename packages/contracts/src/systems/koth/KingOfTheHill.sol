@@ -233,6 +233,9 @@ contract KingOfTheHill is System {
         // setting resetTime as game id proxy
         uint256 resetTime = block.timestamp;
         KingOfTheHillConfig.setLastResetTime(_smartObjectId, resetTime);
+
+        // adding init value for pool
+        KingOfTheHillStatus.setTotalItemCount(_smartObjectId, resetTime, _initItemQuantity);
         
         // moving status setting to reset
         KingOfTheHillStatus.setLastClaimedTime(
