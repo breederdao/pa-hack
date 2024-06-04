@@ -78,7 +78,6 @@ contract KingOfTheHill is System {
             );
         }
 
-
         KingOfTheHillConfig.set(
             _smartObjectId,
             _duration,
