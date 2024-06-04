@@ -6,13 +6,19 @@
 
 ## Installation
 
-1. From the root directory, run the command `pnpm install`.
+1. From the root `pa-hack` directory, run the command `pnpm install`.
 2. Navigate to the `contracts` folder by running `cd packages/contracts` from the root directory.
 3. Change your MUD namespace in the `contracts/mud.config.ts` file.
 4. After changing the namespace, run the command `pnpm clean`. Note: If you encounter an error in the `/scripts` folder, comment out the `IKingOfTheHill(worldAddress)` part.
 5. Build the project by running the command `pnpm build`.
-6. Deploy the project on the PA world using the command `pnpm run deploy:testnet --world-address 0x8dc9cab3e97da6df615a8a24cc07baf110d63071`.
-7. Uncomment the `IKingOfTheHill(worldAddress)` line in the `/scripts/` directory under `contracts`. Change your prefix based on the `mud.config.ts` file. Example: `SetKingOfTheHillConfig.s.sol IKingOfTheHill(worldAddress).yourMudPrefix__setKingOfTheHillConfig(smartStorageUnitId, 3 minutes, itemId, 3)`.
+6. Deploy the project on the PA world using the command:
+   ```
+   pnpm run deploy:testnet --world-address 0x8dc9cab3e97da6df615a8a24cc07baf110d63071
+   ```
+7. Uncomment the `IKingOfTheHill(worldAddress)` line in the `/scripts/` directory under `contracts`. Change your prefix based on the `mud.config.ts` file. Example:
+   ```
+   SetKingOfTheHillConfig.s.sol IKingOfTheHill(worldAddress).yourMudPrefix__setKingOfTheHillConfig(smartStorageUnitId, 3 minutes, itemId, 3)
+   ```
 
 ## Available Commands
 
