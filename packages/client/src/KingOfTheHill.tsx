@@ -1,6 +1,18 @@
 import MainButton from "./components/buttons/MainButton"
 
-const KingOfTheHill = () => {
+export interface IKingOfTheHillData {
+  timer?: number;
+  runningTime?: number;
+  currentKing?: string;
+  claimable: boolean;
+  receiveable: boolean;
+}
+
+interface KingOfTheHillProps {
+  data: IKingOfTheHillData;
+}
+
+const KingOfTheHill: React.FC<KingOfTheHillProps> = ({ data }): JSX.Element => {
   return (
     <>
       <div className='border-[1px] border-dusty-orange mb-6'>
@@ -22,7 +34,7 @@ const KingOfTheHill = () => {
       <h2 className='text-rust font-normal text-xl leading-7 text-center'>Current King</h2>
       <div className="border-cedar border bg-night px-4 py-2 text- mb-6 text-center">
         <span className='text-dusty-orange font-bold text-2xl leading-8'>
-          SampleUsername
+          {data.currentKing}
         </span>
       </div>
 

@@ -14,13 +14,15 @@ interface ContainerProps {
 
 const Container: React.FC<ContainerProps> = ({ children, title }) => {
   return (
-    <div className='relative w-[528px] border-dusty-orange border-[5px] mx-auto text-dusty-orange bg-repeat font-courier
-      before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-b before:from-night before:from-10% before:to-cedar before:to-90% bg-[url(images/container-bg.png)] before:z-[-1]'>
-      <Header title={title} />
-      <div className='px-10 pt-[26px] pb-[57px]'>
-        {children}
+    <div className='w-screen h-screen flex justify-center items-center'>
+      <div className='relative w-[528px] border-dusty-orange border-[5px] text-dusty-orange bg-repeat font-courier
+        before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-b before:from-night before:from-10% before:to-cedar before:to-90% bg-[url(images/container-bg.png)] before:z-[-1]'>
+        <Header title={title} />
+        <div className='px-10 pt-[26px] pb-[57px]'>
+          {children}
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </div>
   );
 };
