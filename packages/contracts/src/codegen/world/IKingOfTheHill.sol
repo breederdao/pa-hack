@@ -8,14 +8,14 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IKingOfTheHill {
-  function bdArena__setKingOfTheHillConfig(
+  function action__setKingOfTheHillConfig(
     uint256 _smartObjectId,
     uint256 _duration,
     uint256 _expectedItemId,
     uint256 _expectedItemIncrement
   ) external;
 
-  function bdArena__claimKing(uint256 _smartObjectId) external;
+  function action__claimKing(uint256 _smartObjectId) external;
 
-  function bdArena__claimPrize(uint256 _smartObjectId) external;
+  function action__claimPrize(uint256 _smartObjectId) external;
 }
