@@ -78,8 +78,6 @@ contract KingOfTheHill is System {
             );
         }
 
-        // adding limit so people have to deposit after every claim to make sure they're present
-        _inventoryLib().setInventoryCapacity(_smartObjectId, 20);
 
         KingOfTheHillConfig.set(
             _smartObjectId,
@@ -290,7 +288,7 @@ contract KingOfTheHill is System {
         // get lastResetTime for game id purposes
         uint256 lastResetTime = kingOfTheHillConfigData.lastResetTime;
 
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
+        return KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
     }
 
     function getCurrentStatusData(uint256 _smartObjectId) public view returns (
