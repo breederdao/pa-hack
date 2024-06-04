@@ -17,13 +17,13 @@ export default mudConfig({
         duration: "uint256",
         expectedItemId: "uint256", // item required
         expectedItemIncrement: "uint256",
-        lastResetTime: "uint256" // based on resetTime
+        lastResetTime: "uint256" // based on startTime
       },
     },
     KingOfTheHillStatus: {
       keySchema: {
         smartObjectId: "uint256",
-        // lastResetTime: "uint256" // id can be lastResetTime
+        lastResetTime: "uint256" // id can be lastResetTime
       },
       valueSchema: {
         king: "address",

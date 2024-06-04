@@ -31,7 +31,7 @@ struct KingOfTheHillConfigData {
   uint256 duration;
   uint256 expectedItemId;
   uint256 expectedItemIncrement;
-  uint256 lastStartTime;
+  uint256 lastResetTime;
 }
 
 library KingOfTheHillConfig {
@@ -86,7 +86,7 @@ library KingOfTheHillConfig {
     fieldNames[0] = "duration";
     fieldNames[1] = "expectedItemId";
     fieldNames[2] = "expectedItemIncrement";
-    fieldNames[3] = "lastStartTime";
+    fieldNames[3] = "lastResetTime";
   }
 
   /**
@@ -230,9 +230,9 @@ library KingOfTheHillConfig {
   }
 
   /**
-   * @notice Get lastStartTime.
+   * @notice Get lastResetTime.
    */
-  function getLastStartTime(uint256 smartObjectId) internal view returns (uint256 lastStartTime) {
+  function getLastResetTime(uint256 smartObjectId) internal view returns (uint256 lastResetTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
@@ -241,9 +241,9 @@ library KingOfTheHillConfig {
   }
 
   /**
-   * @notice Get lastStartTime.
+   * @notice Get lastResetTime.
    */
-  function _getLastStartTime(uint256 smartObjectId) internal view returns (uint256 lastStartTime) {
+  function _getLastResetTime(uint256 smartObjectId) internal view returns (uint256 lastResetTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
@@ -252,23 +252,23 @@ library KingOfTheHillConfig {
   }
 
   /**
-   * @notice Set lastStartTime.
+   * @notice Set lastResetTime.
    */
-  function setLastStartTime(uint256 smartObjectId, uint256 lastStartTime) internal {
+  function setLastResetTime(uint256 smartObjectId, uint256 lastResetTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((lastStartTime)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((lastResetTime)), _fieldLayout);
   }
 
   /**
-   * @notice Set lastStartTime.
+   * @notice Set lastResetTime.
    */
-  function _setLastStartTime(uint256 smartObjectId, uint256 lastStartTime) internal {
+  function _setLastResetTime(uint256 smartObjectId, uint256 lastResetTime) internal {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((lastStartTime)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((lastResetTime)), _fieldLayout);
   }
 
   /**
@@ -309,9 +309,9 @@ library KingOfTheHillConfig {
     uint256 duration,
     uint256 expectedItemId,
     uint256 expectedItemIncrement,
-    uint256 lastStartTime
+    uint256 lastResetTime
   ) internal {
-    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastStartTime);
+    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastResetTime);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -330,9 +330,9 @@ library KingOfTheHillConfig {
     uint256 duration,
     uint256 expectedItemId,
     uint256 expectedItemIncrement,
-    uint256 lastStartTime
+    uint256 lastResetTime
   ) internal {
-    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastStartTime);
+    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastResetTime);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -351,7 +351,7 @@ library KingOfTheHillConfig {
       _table.duration,
       _table.expectedItemId,
       _table.expectedItemIncrement,
-      _table.lastStartTime
+      _table.lastResetTime
     );
 
     PackedCounter _encodedLengths;
@@ -371,7 +371,7 @@ library KingOfTheHillConfig {
       _table.duration,
       _table.expectedItemId,
       _table.expectedItemIncrement,
-      _table.lastStartTime
+      _table.lastResetTime
     );
 
     PackedCounter _encodedLengths;
@@ -391,7 +391,7 @@ library KingOfTheHillConfig {
   )
     internal
     pure
-    returns (uint256 duration, uint256 expectedItemId, uint256 expectedItemIncrement, uint256 lastStartTime)
+    returns (uint256 duration, uint256 expectedItemId, uint256 expectedItemIncrement, uint256 lastResetTime)
   {
     duration = (uint256(Bytes.slice32(_blob, 0)));
 
@@ -399,7 +399,7 @@ library KingOfTheHillConfig {
 
     expectedItemIncrement = (uint256(Bytes.slice32(_blob, 64)));
 
-    lastStartTime = (uint256(Bytes.slice32(_blob, 96)));
+    lastResetTime = (uint256(Bytes.slice32(_blob, 96)));
   }
 
   /**
@@ -413,7 +413,7 @@ library KingOfTheHillConfig {
     PackedCounter,
     bytes memory
   ) internal pure returns (KingOfTheHillConfigData memory _table) {
-    (_table.duration, _table.expectedItemId, _table.expectedItemIncrement, _table.lastStartTime) = decodeStatic(
+    (_table.duration, _table.expectedItemId, _table.expectedItemIncrement, _table.lastResetTime) = decodeStatic(
       _staticData
     );
   }
@@ -446,9 +446,9 @@ library KingOfTheHillConfig {
     uint256 duration,
     uint256 expectedItemId,
     uint256 expectedItemIncrement,
-    uint256 lastStartTime
+    uint256 lastResetTime
   ) internal pure returns (bytes memory) {
-    return abi.encodePacked(duration, expectedItemId, expectedItemIncrement, lastStartTime);
+    return abi.encodePacked(duration, expectedItemId, expectedItemIncrement, lastResetTime);
   }
 
   /**
@@ -461,9 +461,9 @@ library KingOfTheHillConfig {
     uint256 duration,
     uint256 expectedItemId,
     uint256 expectedItemIncrement,
-    uint256 lastStartTime
+    uint256 lastResetTime
   ) internal pure returns (bytes memory, PackedCounter, bytes memory) {
-    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastStartTime);
+    bytes memory _staticData = encodeStatic(duration, expectedItemId, expectedItemIncrement, lastResetTime);
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;

@@ -59,8 +59,12 @@ contract KingOfTheHill is System {
     }
 
     function claimKing(uint256 _smartObjectId) public {
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId);
         KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
+
+        // get lastResetTime for game id purposes
+        uint256 lastResetTime = kingOfTheHillConfigData.lastResetTime;
+
+        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId, lastResetTime);
 
         // making sure that no one can claim past duration
         uint256 duration = kingOfTheHillConfigData.duration;
@@ -102,12 +106,16 @@ contract KingOfTheHill is System {
         _inventoryLib().ephemeralToInventoryTransfer(_smartObjectId, inItems);
 
         // updating status
-        KingOfTheHillStatus.set(_smartObjectId, msg.sender, startTime, block.timestamp, updatedItemCount, false);
+        KingOfTheHillStatus.set(_smartObjectId, lastResetTime, msg.sender, startTime, block.timestamp, updatedItemCount, false);
     }
 
-    function claimPrize(uint256 _smartObjectId) public {
+    function claimPrize(uint256 _smartObjectId, uint256 _resetTime) public {
         KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId);
+
+        // 0 if for last round or exact resetTime if for past events
+        uint256 resetTime = _resetTime || kingOfTheHillConfigData.lastResetTime;
+
+        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId, resetTime);
 
         // make sure king is claiming
         address king = kingOfTheHillStatusData.king;
@@ -135,7 +143,37 @@ contract KingOfTheHill is System {
         _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
 
         // updating status to claimed
-        KingOfTheHillStatus.setClaimed(_smartObjectId, true);
+        KingOfTheHillStatus.setClaimed(_smartObjectId, resetTime, true);
+    }
+
+    function resetGame(uint256 _smartObjectId, uint256 _initItemQuantity) public {
+        KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
+
+        address ssuOwner = IERC721(DeployableTokenTable.getErc721Address(_namespace().deployableTokenTableId())).ownerOf(
+            _smartObjectId
+        );
+
+        require(msg.sender == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
+
+        // seeding initial value
+        uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
+
+        EntityRecordTableData memory itemInEntity = EntityRecordTable.get(
+            _namespace().entityRecordTableId(),
+            expectedItemId
+        );
+        InventoryItem[] memory inItems = new InventoryItem[](1);
+        inItems[0] = InventoryItem(
+            expectedItemId,
+            msg.sender,
+            itemInEntity.typeId,
+            itemInEntity.itemId,
+            itemInEntity.volume,
+            _initItemQuantity
+        );
+        _inventoryLib().ephemeralToInventoryTransfer(_smartObjectId, inItems);
+
+        KingOfTheHillConfig.setLastResetTime(_smartObjectId, block.timestamp);
     }
 
     function _inventoryLib() internal view returns (InventoryLib.World memory) {

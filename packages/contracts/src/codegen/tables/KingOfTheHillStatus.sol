@@ -49,8 +49,9 @@ library KingOfTheHillStatus {
    * @return _keySchema The key schema for the table.
    */
   function getKeySchema() internal pure returns (Schema) {
-    SchemaType[] memory _keySchema = new SchemaType[](1);
+    SchemaType[] memory _keySchema = new SchemaType[](2);
     _keySchema[0] = SchemaType.UINT256;
+    _keySchema[1] = SchemaType.UINT256;
 
     return SchemaLib.encode(_keySchema);
   }
@@ -75,8 +76,9 @@ library KingOfTheHillStatus {
    * @return keyNames An array of strings with the names of key fields.
    */
   function getKeyNames() internal pure returns (string[] memory keyNames) {
-    keyNames = new string[](1);
+    keyNames = new string[](2);
     keyNames[0] = "smartObjectId";
+    keyNames[1] = "lastResetTime";
   }
 
   /**
@@ -109,9 +111,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get king.
    */
-  function getKing(uint256 smartObjectId) internal view returns (address king) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getKing(uint256 smartObjectId, uint256 lastResetTime) internal view returns (address king) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
@@ -120,9 +123,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get king.
    */
-  function _getKing(uint256 smartObjectId) internal view returns (address king) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _getKing(uint256 smartObjectId, uint256 lastResetTime) internal view returns (address king) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 0, _fieldLayout);
     return (address(bytes20(_blob)));
@@ -131,9 +135,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set king.
    */
-  function setKing(uint256 smartObjectId, address king) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setKing(uint256 smartObjectId, uint256 lastResetTime, address king) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((king)), _fieldLayout);
   }
@@ -141,9 +146,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set king.
    */
-  function _setKing(uint256 smartObjectId, address king) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _setKing(uint256 smartObjectId, uint256 lastResetTime, address king) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setStaticField(_tableId, _keyTuple, 0, abi.encodePacked((king)), _fieldLayout);
   }
@@ -151,9 +157,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get startTime.
    */
-  function getStartTime(uint256 smartObjectId) internal view returns (uint256 startTime) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getStartTime(uint256 smartObjectId, uint256 lastResetTime) internal view returns (uint256 startTime) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -162,9 +169,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get startTime.
    */
-  function _getStartTime(uint256 smartObjectId) internal view returns (uint256 startTime) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _getStartTime(uint256 smartObjectId, uint256 lastResetTime) internal view returns (uint256 startTime) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 1, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -173,9 +181,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set startTime.
    */
-  function setStartTime(uint256 smartObjectId, uint256 startTime) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setStartTime(uint256 smartObjectId, uint256 lastResetTime, uint256 startTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((startTime)), _fieldLayout);
   }
@@ -183,9 +192,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set startTime.
    */
-  function _setStartTime(uint256 smartObjectId, uint256 startTime) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _setStartTime(uint256 smartObjectId, uint256 lastResetTime, uint256 startTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setStaticField(_tableId, _keyTuple, 1, abi.encodePacked((startTime)), _fieldLayout);
   }
@@ -193,9 +203,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get lastClaimedTime.
    */
-  function getLastClaimedTime(uint256 smartObjectId) internal view returns (uint256 lastClaimedTime) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getLastClaimedTime(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (uint256 lastClaimedTime) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 2, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -204,9 +218,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get lastClaimedTime.
    */
-  function _getLastClaimedTime(uint256 smartObjectId) internal view returns (uint256 lastClaimedTime) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _getLastClaimedTime(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (uint256 lastClaimedTime) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 2, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -215,9 +233,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set lastClaimedTime.
    */
-  function setLastClaimedTime(uint256 smartObjectId, uint256 lastClaimedTime) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setLastClaimedTime(uint256 smartObjectId, uint256 lastResetTime, uint256 lastClaimedTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setStaticField(_tableId, _keyTuple, 2, abi.encodePacked((lastClaimedTime)), _fieldLayout);
   }
@@ -225,9 +244,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set lastClaimedTime.
    */
-  function _setLastClaimedTime(uint256 smartObjectId, uint256 lastClaimedTime) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _setLastClaimedTime(uint256 smartObjectId, uint256 lastResetTime, uint256 lastClaimedTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setStaticField(_tableId, _keyTuple, 2, abi.encodePacked((lastClaimedTime)), _fieldLayout);
   }
@@ -235,9 +255,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get totalItemCount.
    */
-  function getTotalItemCount(uint256 smartObjectId) internal view returns (uint256 totalItemCount) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getTotalItemCount(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (uint256 totalItemCount) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 3, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -246,9 +270,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get totalItemCount.
    */
-  function _getTotalItemCount(uint256 smartObjectId) internal view returns (uint256 totalItemCount) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _getTotalItemCount(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (uint256 totalItemCount) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 3, _fieldLayout);
     return (uint256(bytes32(_blob)));
@@ -257,9 +285,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set totalItemCount.
    */
-  function setTotalItemCount(uint256 smartObjectId, uint256 totalItemCount) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setTotalItemCount(uint256 smartObjectId, uint256 lastResetTime, uint256 totalItemCount) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((totalItemCount)), _fieldLayout);
   }
@@ -267,9 +296,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set totalItemCount.
    */
-  function _setTotalItemCount(uint256 smartObjectId, uint256 totalItemCount) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _setTotalItemCount(uint256 smartObjectId, uint256 lastResetTime, uint256 totalItemCount) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setStaticField(_tableId, _keyTuple, 3, abi.encodePacked((totalItemCount)), _fieldLayout);
   }
@@ -277,9 +307,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get claimed.
    */
-  function getClaimed(uint256 smartObjectId) internal view returns (bool claimed) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function getClaimed(uint256 smartObjectId, uint256 lastResetTime) internal view returns (bool claimed) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
     return (_toBool(uint8(bytes1(_blob))));
@@ -288,9 +319,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Get claimed.
    */
-  function _getClaimed(uint256 smartObjectId) internal view returns (bool claimed) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _getClaimed(uint256 smartObjectId, uint256 lastResetTime) internal view returns (bool claimed) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
     return (_toBool(uint8(bytes1(_blob))));
@@ -299,9 +331,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set claimed.
    */
-  function setClaimed(uint256 smartObjectId, bool claimed) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function setClaimed(uint256 smartObjectId, uint256 lastResetTime, bool claimed) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((claimed)), _fieldLayout);
   }
@@ -309,9 +342,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Set claimed.
    */
-  function _setClaimed(uint256 smartObjectId, bool claimed) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _setClaimed(uint256 smartObjectId, uint256 lastResetTime, bool claimed) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((claimed)), _fieldLayout);
   }
@@ -319,9 +353,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get the full data.
    */
-  function get(uint256 smartObjectId) internal view returns (KingOfTheHillStatusData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function get(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (KingOfTheHillStatusData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     (bytes memory _staticData, PackedCounter _encodedLengths, bytes memory _dynamicData) = StoreSwitch.getRecord(
       _tableId,
@@ -334,9 +372,13 @@ library KingOfTheHillStatus {
   /**
    * @notice Get the full data.
    */
-  function _get(uint256 smartObjectId) internal view returns (KingOfTheHillStatusData memory _table) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _get(
+    uint256 smartObjectId,
+    uint256 lastResetTime
+  ) internal view returns (KingOfTheHillStatusData memory _table) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     (bytes memory _staticData, PackedCounter _encodedLengths, bytes memory _dynamicData) = StoreCore.getRecord(
       _tableId,
@@ -351,6 +393,7 @@ library KingOfTheHillStatus {
    */
   function set(
     uint256 smartObjectId,
+    uint256 lastResetTime,
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
@@ -362,8 +405,9 @@ library KingOfTheHillStatus {
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _staticData, _encodedLengths, _dynamicData);
   }
@@ -373,6 +417,7 @@ library KingOfTheHillStatus {
    */
   function _set(
     uint256 smartObjectId,
+    uint256 lastResetTime,
     address king,
     uint256 startTime,
     uint256 lastClaimedTime,
@@ -384,8 +429,9 @@ library KingOfTheHillStatus {
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setRecord(_tableId, _keyTuple, _staticData, _encodedLengths, _dynamicData, _fieldLayout);
   }
@@ -393,7 +439,7 @@ library KingOfTheHillStatus {
   /**
    * @notice Set the full data using the data struct.
    */
-  function set(uint256 smartObjectId, KingOfTheHillStatusData memory _table) internal {
+  function set(uint256 smartObjectId, uint256 lastResetTime, KingOfTheHillStatusData memory _table) internal {
     bytes memory _staticData = encodeStatic(
       _table.king,
       _table.startTime,
@@ -405,8 +451,9 @@ library KingOfTheHillStatus {
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.setRecord(_tableId, _keyTuple, _staticData, _encodedLengths, _dynamicData);
   }
@@ -414,7 +461,7 @@ library KingOfTheHillStatus {
   /**
    * @notice Set the full data using the data struct.
    */
-  function _set(uint256 smartObjectId, KingOfTheHillStatusData memory _table) internal {
+  function _set(uint256 smartObjectId, uint256 lastResetTime, KingOfTheHillStatusData memory _table) internal {
     bytes memory _staticData = encodeStatic(
       _table.king,
       _table.startTime,
@@ -426,8 +473,9 @@ library KingOfTheHillStatus {
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
 
-    bytes32[] memory _keyTuple = new bytes32[](1);
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.setRecord(_tableId, _keyTuple, _staticData, _encodedLengths, _dynamicData, _fieldLayout);
   }
@@ -472,9 +520,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Delete all data for given keys.
    */
-  function deleteRecord(uint256 smartObjectId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function deleteRecord(uint256 smartObjectId, uint256 lastResetTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreSwitch.deleteRecord(_tableId, _keyTuple);
   }
@@ -482,9 +531,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Delete all data for given keys.
    */
-  function _deleteRecord(uint256 smartObjectId) internal {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function _deleteRecord(uint256 smartObjectId, uint256 lastResetTime) internal {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     StoreCore.deleteRecord(_tableId, _keyTuple, _fieldLayout);
   }
@@ -527,9 +577,10 @@ library KingOfTheHillStatus {
   /**
    * @notice Encode keys as a bytes32 array using this table's field layout.
    */
-  function encodeKeyTuple(uint256 smartObjectId) internal pure returns (bytes32[] memory) {
-    bytes32[] memory _keyTuple = new bytes32[](1);
+  function encodeKeyTuple(uint256 smartObjectId, uint256 lastResetTime) internal pure returns (bytes32[] memory) {
+    bytes32[] memory _keyTuple = new bytes32[](2);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
+    _keyTuple[1] = bytes32(uint256(lastResetTime));
 
     return _keyTuple;
   }

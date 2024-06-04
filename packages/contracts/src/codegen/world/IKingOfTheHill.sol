@@ -18,4 +18,6 @@ interface IKingOfTheHill {
   function bdArena__claimKing(uint256 _smartObjectId) external;
 
   function bdArena__claimPrize(uint256 _smartObjectId) external;
+
+  function bdArena__resetGame(uint256 _smartObjectId, uint256 _initItemQuantity) external;
 }
