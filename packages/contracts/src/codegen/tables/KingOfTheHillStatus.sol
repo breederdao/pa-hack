@@ -19,8 +19,8 @@ import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
-// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "bdArena", name: "KingOfTheHillSta", typeId: RESOURCE_TABLE });`
-ResourceId constant _tableId = ResourceId.wrap(0x746262644172656e61000000000000004b696e674f6654686548696c6c537461);
+// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "action", name: "KingOfTheHillSta", typeId: RESOURCE_TABLE });`
+ResourceId constant _tableId = ResourceId.wrap(0x7462616374696f6e00000000000000004b696e674f6654686548696c6c537461);
 ResourceId constant KingOfTheHillStatusTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(

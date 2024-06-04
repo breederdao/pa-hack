@@ -1,17 +1,17 @@
-import { mudConfig } from "@latticexyz/world/register";
+import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: "bdArena",
+  namespace: 'action',
   systems: {
     KingOfTheHill: {
-      name: "KingOfTheHill",
+      name: 'KingOfTheHill',
       openAccess: true,
-    }
+    },
   },
   tables: {
     KingOfTheHillConfig: {
       keySchema: {
-        smartObjectId: "uint256"
+        smartObjectId: 'uint256',
       },
       valueSchema: {
         duration: "uint256",
@@ -26,12 +26,12 @@ export default mudConfig({
         lastResetTime: "uint256" // id can be lastResetTime
       },
       valueSchema: {
-        king: "address",
-        startTime: "uint256", // to calculate total running time
-        lastClaimedTime: "uint256",
-        totalItemCount: "uint256", // total pot
-        claimed: "bool"
+        king: 'address',
+        startTime: 'uint256', // to calculate total running time
+        lastClaimedTime: 'uint256',
+        totalItemCount: 'uint256', // total pot
+        claimed: 'bool',
       },
-    }
+    },
   },
-});
+})
