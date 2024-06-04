@@ -23,6 +23,8 @@ import { Utils as InventoryUtils } from "@eveworld/world/src/modules/inventory/U
 import { Utils as SmartDeployableUtils } from "@eveworld/world/src/modules/smart-deployable/Utils.sol";
 import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@eveworld/common-constants/src/constants.sol";
 
+import { InventoryInteract } from "@eveworld/world/src/modules/inventory/system/InventoryInteract.sol";
+
 import { KingOfTheHillConfig, KingOfTheHillConfigData } from "../../codegen/tables/KingOfTheHillConfig.sol";
 import { KingOfTheHillStatus, KingOfTheHillStatusData } from "../../codegen/tables/KingOfTheHillStatus.sol";
 
@@ -33,18 +35,30 @@ contract KingOfTheHill is System {
     using SmartDeployableUtils for bytes14;
 
     // add access control
-    function setKingOfTheHillConfig(uint256 _smartObjectId, uint256 _duration, uint256 _expectedItemId, uint256 _expectedItemIncrement) public {
-        address ssuOwner = IERC721(DeployableTokenTable.getErc721Address(_namespace().deployableTokenTableId())).ownerOf(
-            _smartObjectId
+    function setKingOfTheHillConfig(
+        uint256 _smartObjectId,
+        uint256 _duration,
+        uint256 _expectedItemId,
+        uint256 _expectedItemIncrement
+    ) public {
+        address ssuOwner = IERC721(
+            DeployableTokenTable.getErc721Address(
+                _namespace().deployableTokenTableId()
+            )
+        ).ownerOf(_smartObjectId);
+
+        require(
+            _msgSender() == ssuOwner,
+            "KingOfTheHill.setKingOfTheHillConfig: not owned"
         );
 
-        require(msg.sender == ssuOwner, "KingOfTheHill.setKingOfTheHillConfig: not owned");
-
+        // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
             _namespace().entityRecordTableId(),
             _expectedItemId
         );
 
+        // check if item exist on chain, else revert
         if (entityInRecord.recordExists == false) {
             revert IInventoryErrors.Inventory_InvalidItem(
                 "KingOfTheHill: item is not created on-chain",
@@ -52,33 +66,57 @@ contract KingOfTheHill is System {
             );
         }
 
-        KingOfTheHillConfig.set(_smartObjectId, _duration, _expectedItemId, _expectedItemIncrement, uint256(0));
+        KingOfTheHillConfig.set(
+            _smartObjectId,
+            _duration,
+            _expectedItemId,
+            _expectedItemIncrement,
+            0
+        );
+
+        KingOfTheHillStatus.setLastClaimedTime(
+            _smartObjectId,
+            block.timestamp + 5 days
+        );
+        KingOfTheHillStatus.setKing(_smartObjectId, address(0));
+        KingOfTheHillStatus.setClaimed(_smartObjectId, false);
     }
 
     function claimKing(uint256 _smartObjectId) public {
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId);
-        KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
+        KingOfTheHillStatusData
+            memory kingOfTheHillStatusData = KingOfTheHillStatus.get(
+                _smartObjectId
+            );
+        KingOfTheHillConfigData
+            memory kingOfTheHillConfigData = KingOfTheHillConfig.get(
+                _smartObjectId
+            );
 
         // making sure that no one can claim past duration
         uint256 duration = kingOfTheHillConfigData.duration;
         uint256 lastClaimedTime = kingOfTheHillStatusData.lastClaimedTime;
-        require(lastClaimedTime + duration < block.timestamp, "KingOfTheHill.claimKing: game has ended");
+        // Ensure the game is still running
+        // require(lastClaimedTime + duration < block.timestamp, "KingOfTheHill.claimKing: game has ended");
+        require(
+            lastClaimedTime + duration >= block.timestamp,
+            "KingOfTheHill.claimKing: game has ended. done"
+        );
 
         // king cannot reclaim
         address king = kingOfTheHillStatusData.king;
-        require(msg.sender != king, "KingOfTheHill.claimKing: already king");
+        require(_msgSender() != king, "KingOfTheHill.claimKing: already king");
 
-        // setting startTime if it does not exist
         uint256 startTime;
-        if(kingOfTheHillStatusData.startTime == 0) {
-            startTime = kingOfTheHillStatusData.startTime;
-        } else {
+        if (kingOfTheHillStatusData.startTime == 0) {
             startTime = block.timestamp;
+        } else {
+            startTime = kingOfTheHillStatusData.startTime;
         }
 
         // computing item deposit
         uint256 currentItemCount = kingOfTheHillStatusData.totalItemCount;
-        uint256 expectedItemIncrement = kingOfTheHillConfigData.expectedItemIncrement;
+        uint256 expectedItemIncrement = kingOfTheHillConfigData
+            .expectedItemIncrement;
         uint256 updatedItemCount = currentItemCount + expectedItemIncrement;
 
         // getting item from user
@@ -99,16 +137,36 @@ contract KingOfTheHill is System {
         _inventoryLib().ephemeralToInventoryTransfer(_smartObjectId, inItems);
 
         // updating status
-        KingOfTheHillStatus.set(_smartObjectId, msg.sender, startTime, block.timestamp, updatedItemCount, false);
+        KingOfTheHillStatus.set(
+            _smartObjectId,
+            _msgSender(),
+            startTime,
+            block.timestamp,
+            updatedItemCount,
+            false
+        );
     }
 
     function claimPrize(uint256 _smartObjectId) public {
-        KingOfTheHillConfigData memory kingOfTheHillConfigData = KingOfTheHillConfig.get(_smartObjectId);
-        KingOfTheHillStatusData memory kingOfTheHillStatusData = KingOfTheHillStatus.get(_smartObjectId);
+        KingOfTheHillConfigData
+            memory kingOfTheHillConfigData = KingOfTheHillConfig.get(
+                _smartObjectId
+            );
+        KingOfTheHillStatusData
+            memory kingOfTheHillStatusData = KingOfTheHillStatus.get(
+                _smartObjectId
+            );
 
         // make sure king is claiming
         address king = kingOfTheHillStatusData.king;
-        require(msg.sender == king, "KingOfTheHill.claimPrize: must be king");
+        require(_msgSender() == king, "KingOfTheHill.claimPrize: must be king");
+
+        uint256 duration = kingOfTheHillConfigData.duration;
+        uint256 lastClaimedTime = kingOfTheHillStatusData.lastClaimedTime;
+        require(
+            lastClaimedTime + duration < block.timestamp,
+            "KingOfTheHill.claimKing: game has not ended"
+        );
 
         // giving item to user
         uint256 expectedItemId = kingOfTheHillConfigData.expectedItemId;
@@ -117,6 +175,7 @@ contract KingOfTheHill is System {
             _namespace().entityRecordTableId(),
             expectedItemId
         );
+
         InventoryItem[] memory outItems = new InventoryItem[](1);
         outItems[0] = InventoryItem(
             expectedItemId,
@@ -133,9 +192,23 @@ contract KingOfTheHill is System {
     }
 
     function _inventoryLib() internal view returns (InventoryLib.World memory) {
-        if (!ResourceIds.getExists(WorldResourceIdLib.encodeNamespace(DEPLOYMENT_NAMESPACE))) {
-            return InventoryLib.World({ iface: IBaseWorld(_world()), namespace: DEPLOYMENT_NAMESPACE });
-        } else return InventoryLib.World({ iface: IBaseWorld(_world()), namespace: DEPLOYMENT_NAMESPACE });
+        //InventoryLib.World({ iface: IBaseWorld(_world()), namespace: INVENTORY_DEPLOYMENT_NAMESPACE })
+        if (
+            !ResourceIds.getExists(
+                WorldResourceIdLib.encodeNamespace(DEPLOYMENT_NAMESPACE)
+            )
+        ) {
+            return
+                InventoryLib.World({
+                    iface: IBaseWorld(_world()),
+                    namespace: DEPLOYMENT_NAMESPACE
+                });
+        } else
+            return
+                InventoryLib.World({
+                    iface: IBaseWorld(_world()),
+                    namespace: DEPLOYMENT_NAMESPACE
+                });
     }
 
     function _namespace() internal pure returns (bytes14 namespace) {
