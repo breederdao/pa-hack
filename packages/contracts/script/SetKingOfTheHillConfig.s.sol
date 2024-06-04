@@ -28,12 +28,12 @@ contract SetKingOfTheHillConfig is Script {
         //     itemId,
         //     5 // increment by 5 every claim
         // );
-        // IKingOfTheHill(worldAddress).lala__setKingOfTheHillConfig(
-        //     smartStorageUnitId,
-        //     3 minutes,
-        //     itemId,
-        //     2
-        // );
+        IKingOfTheHill(worldAddress).king__setKingOfTheHillConfig(
+            smartStorageUnitId,
+            3 minutes,
+            itemId,
+            3
+        );
 
         vm.stopBroadcast();
     }
