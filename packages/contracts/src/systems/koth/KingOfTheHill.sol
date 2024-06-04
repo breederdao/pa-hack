@@ -41,7 +41,7 @@ contract KingOfTheHill is System {
 
         require(
             _msgSender() == ssuOwner,
-            "KingOfTheHill: only SSU owner can call this function"
+            "KingOfTheHill.setKingOfTheHillConfig: not owned"
         );
         _;
     }
@@ -52,17 +52,7 @@ contract KingOfTheHill is System {
         uint256 _duration,
         uint256 _expectedItemId,
         uint256 _expectedItemIncrement
-    ) public {
-        address ssuOwner = IERC721(
-            DeployableTokenTable.getErc721Address(
-                _namespace().deployableTokenTableId()
-            )
-        ).ownerOf(_smartObjectId);
-
-        require(
-            _msgSender() == ssuOwner,
-            "KingOfTheHill.setKingOfTheHillConfig: not owned"
-        );
+    ) public onlySSUOwner(_smartObjectId) {
 
         // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
