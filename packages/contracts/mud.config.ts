@@ -46,6 +46,7 @@ export default mudConfig({
         playerCount: 'uint256',
         expectedItemId: 'uint256',
         expectedItemQuantity: 'uint256',
+        expectedControlDepositId: 'uint256',
         lastResetTime: 'uint256'
       }
     },
@@ -61,6 +62,18 @@ export default mudConfig({
         teamAPlayers: 'uint256',
         teamBPlayers: 'uint256',
         claimed: "bool"
+      }
+    },
+    ACPointStatus: {
+      keySchema: {
+        smartObjectId: 'uint256',
+        lastResetTime: 'uint256'
+      },
+      valueSchema: {
+        controllingTeam: 'uint256',
+        lastControlChangeTime: 'uint256',
+        teamATime: 'uint256',
+        teamBTime: 'uint256'
       }
     }
   },

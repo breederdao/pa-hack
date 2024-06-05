@@ -19,8 +19,8 @@ import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
-// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "action", name: "ACLobbyStatus", typeId: RESOURCE_TABLE });`
-ResourceId constant _tableId = ResourceId.wrap(0x7462616374696f6e000000000000000041434c6f626279537461747573000000);
+// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "king", name: "ACLobbyStatus", typeId: RESOURCE_TABLE });`
+ResourceId constant _tableId = ResourceId.wrap(0x74626b696e670000000000000000000041434c6f626279537461747573000000);
 ResourceId constant ACLobbyStatusTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(

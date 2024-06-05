@@ -58,6 +58,7 @@ contract AreaControlLobby is System {
         uint256 _playerCount,
         uint256 _expectedItemId,
         uint256 _expectedItemQuantity,
+        uint256 _expectedControlDepositId,
         address[] memory _controlPoints
     ) public onlySSUOwner(_smartObjectId) {
         // make sure item exists
@@ -78,7 +79,7 @@ contract AreaControlLobby is System {
 
         _resetGame(_smartObjectId);
 
-        ACLobbyConfig.set(_smartObjectId, _duration, _playerCount, _expectedItemId, _expectedItemQuantity, 0);
+        ACLobbyConfig.set(_smartObjectId, _duration, _playerCount, _expectedItemId, _expectedItemQuantity, _expectedControlDepositId, 0);
     }
 
     function acResetGame(uint256 _smartObjectId) public onlySSUOwner(_smartObjectId) {
@@ -149,6 +150,10 @@ contract AreaControlLobby is System {
     }
 
     function acClaimPrize(uint256 _smartObjectId) public {
+
+    }
+
+    function getLobbyStatus(uint256 _smartObjectId) public view {
 
     }
 

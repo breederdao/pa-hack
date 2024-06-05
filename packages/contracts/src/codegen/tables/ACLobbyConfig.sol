@@ -19,12 +19,12 @@ import { Schema, SchemaLib } from "@latticexyz/store/src/Schema.sol";
 import { PackedCounter, PackedCounterLib } from "@latticexyz/store/src/PackedCounter.sol";
 import { ResourceId } from "@latticexyz/store/src/ResourceId.sol";
 
-// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "action", name: "ACLobbyConfig", typeId: RESOURCE_TABLE });`
-ResourceId constant _tableId = ResourceId.wrap(0x7462616374696f6e000000000000000041434c6f626279436f6e666967000000);
+// Hex below is the result of `WorldResourceIdLib.encode({ namespace: "king", name: "ACLobbyConfig", typeId: RESOURCE_TABLE });`
+ResourceId constant _tableId = ResourceId.wrap(0x74626b696e670000000000000000000041434c6f626279436f6e666967000000);
 ResourceId constant ACLobbyConfigTableId = _tableId;
 
 FieldLayout constant _fieldLayout = FieldLayout.wrap(
-  0x00a0050020202020200000000000000000000000000000000000000000000000
+  0x00c0060020202020202000000000000000000000000000000000000000000000
 );
 
 struct ACLobbyConfigData {
@@ -32,6 +32,7 @@ struct ACLobbyConfigData {
   uint256 playerCount;
   uint256 expectedItemId;
   uint256 expectedItemQuantity;
+  uint256 expectedControlDepositId;
   uint256 lastResetTime;
 }
 
@@ -60,12 +61,13 @@ library ACLobbyConfig {
    * @return _valueSchema The value schema for the table.
    */
   function getValueSchema() internal pure returns (Schema) {
-    SchemaType[] memory _valueSchema = new SchemaType[](5);
+    SchemaType[] memory _valueSchema = new SchemaType[](6);
     _valueSchema[0] = SchemaType.UINT256;
     _valueSchema[1] = SchemaType.UINT256;
     _valueSchema[2] = SchemaType.UINT256;
     _valueSchema[3] = SchemaType.UINT256;
     _valueSchema[4] = SchemaType.UINT256;
+    _valueSchema[5] = SchemaType.UINT256;
 
     return SchemaLib.encode(_valueSchema);
   }
@@ -84,12 +86,13 @@ library ACLobbyConfig {
    * @return fieldNames An array of strings with the names of value fields.
    */
   function getFieldNames() internal pure returns (string[] memory fieldNames) {
-    fieldNames = new string[](5);
+    fieldNames = new string[](6);
     fieldNames[0] = "duration";
     fieldNames[1] = "playerCount";
     fieldNames[2] = "expectedItemId";
     fieldNames[3] = "expectedItemQuantity";
-    fieldNames[4] = "lastResetTime";
+    fieldNames[4] = "expectedControlDepositId";
+    fieldNames[5] = "lastResetTime";
   }
 
   /**
@@ -275,13 +278,57 @@ library ACLobbyConfig {
   }
 
   /**
+   * @notice Get expectedControlDepositId.
+   */
+  function getExpectedControlDepositId(uint256 smartObjectId) internal view returns (uint256 expectedControlDepositId) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    return (uint256(bytes32(_blob)));
+  }
+
+  /**
+   * @notice Get expectedControlDepositId.
+   */
+  function _getExpectedControlDepositId(
+    uint256 smartObjectId
+  ) internal view returns (uint256 expectedControlDepositId) {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    return (uint256(bytes32(_blob)));
+  }
+
+  /**
+   * @notice Set expectedControlDepositId.
+   */
+  function setExpectedControlDepositId(uint256 smartObjectId, uint256 expectedControlDepositId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((expectedControlDepositId)), _fieldLayout);
+  }
+
+  /**
+   * @notice Set expectedControlDepositId.
+   */
+  function _setExpectedControlDepositId(uint256 smartObjectId, uint256 expectedControlDepositId) internal {
+    bytes32[] memory _keyTuple = new bytes32[](1);
+    _keyTuple[0] = bytes32(uint256(smartObjectId));
+
+    StoreCore.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((expectedControlDepositId)), _fieldLayout);
+  }
+
+  /**
    * @notice Get lastResetTime.
    */
   function getLastResetTime(uint256 smartObjectId) internal view returns (uint256 lastResetTime) {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    bytes32 _blob = StoreSwitch.getStaticField(_tableId, _keyTuple, 5, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
@@ -292,7 +339,7 @@ library ACLobbyConfig {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 4, _fieldLayout);
+    bytes32 _blob = StoreCore.getStaticField(_tableId, _keyTuple, 5, _fieldLayout);
     return (uint256(bytes32(_blob)));
   }
 
@@ -303,7 +350,7 @@ library ACLobbyConfig {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    StoreSwitch.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((lastResetTime)), _fieldLayout);
+    StoreSwitch.setStaticField(_tableId, _keyTuple, 5, abi.encodePacked((lastResetTime)), _fieldLayout);
   }
 
   /**
@@ -313,7 +360,7 @@ library ACLobbyConfig {
     bytes32[] memory _keyTuple = new bytes32[](1);
     _keyTuple[0] = bytes32(uint256(smartObjectId));
 
-    StoreCore.setStaticField(_tableId, _keyTuple, 4, abi.encodePacked((lastResetTime)), _fieldLayout);
+    StoreCore.setStaticField(_tableId, _keyTuple, 5, abi.encodePacked((lastResetTime)), _fieldLayout);
   }
 
   /**
@@ -355,9 +402,17 @@ library ACLobbyConfig {
     uint256 playerCount,
     uint256 expectedItemId,
     uint256 expectedItemQuantity,
+    uint256 expectedControlDepositId,
     uint256 lastResetTime
   ) internal {
-    bytes memory _staticData = encodeStatic(duration, playerCount, expectedItemId, expectedItemQuantity, lastResetTime);
+    bytes memory _staticData = encodeStatic(
+      duration,
+      playerCount,
+      expectedItemId,
+      expectedItemQuantity,
+      expectedControlDepositId,
+      lastResetTime
+    );
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -377,9 +432,17 @@ library ACLobbyConfig {
     uint256 playerCount,
     uint256 expectedItemId,
     uint256 expectedItemQuantity,
+    uint256 expectedControlDepositId,
     uint256 lastResetTime
   ) internal {
-    bytes memory _staticData = encodeStatic(duration, playerCount, expectedItemId, expectedItemQuantity, lastResetTime);
+    bytes memory _staticData = encodeStatic(
+      duration,
+      playerCount,
+      expectedItemId,
+      expectedItemQuantity,
+      expectedControlDepositId,
+      lastResetTime
+    );
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;
@@ -399,6 +462,7 @@ library ACLobbyConfig {
       _table.playerCount,
       _table.expectedItemId,
       _table.expectedItemQuantity,
+      _table.expectedControlDepositId,
       _table.lastResetTime
     );
 
@@ -420,6 +484,7 @@ library ACLobbyConfig {
       _table.playerCount,
       _table.expectedItemId,
       _table.expectedItemQuantity,
+      _table.expectedControlDepositId,
       _table.lastResetTime
     );
 
@@ -445,6 +510,7 @@ library ACLobbyConfig {
       uint256 playerCount,
       uint256 expectedItemId,
       uint256 expectedItemQuantity,
+      uint256 expectedControlDepositId,
       uint256 lastResetTime
     )
   {
@@ -456,7 +522,9 @@ library ACLobbyConfig {
 
     expectedItemQuantity = (uint256(Bytes.slice32(_blob, 96)));
 
-    lastResetTime = (uint256(Bytes.slice32(_blob, 128)));
+    expectedControlDepositId = (uint256(Bytes.slice32(_blob, 128)));
+
+    lastResetTime = (uint256(Bytes.slice32(_blob, 160)));
   }
 
   /**
@@ -475,6 +543,7 @@ library ACLobbyConfig {
       _table.playerCount,
       _table.expectedItemId,
       _table.expectedItemQuantity,
+      _table.expectedControlDepositId,
       _table.lastResetTime
     ) = decodeStatic(_staticData);
   }
@@ -508,9 +577,18 @@ library ACLobbyConfig {
     uint256 playerCount,
     uint256 expectedItemId,
     uint256 expectedItemQuantity,
+    uint256 expectedControlDepositId,
     uint256 lastResetTime
   ) internal pure returns (bytes memory) {
-    return abi.encodePacked(duration, playerCount, expectedItemId, expectedItemQuantity, lastResetTime);
+    return
+      abi.encodePacked(
+        duration,
+        playerCount,
+        expectedItemId,
+        expectedItemQuantity,
+        expectedControlDepositId,
+        lastResetTime
+      );
   }
 
   /**
@@ -524,9 +602,17 @@ library ACLobbyConfig {
     uint256 playerCount,
     uint256 expectedItemId,
     uint256 expectedItemQuantity,
+    uint256 expectedControlDepositId,
     uint256 lastResetTime
   ) internal pure returns (bytes memory, PackedCounter, bytes memory) {
-    bytes memory _staticData = encodeStatic(duration, playerCount, expectedItemId, expectedItemQuantity, lastResetTime);
+    bytes memory _staticData = encodeStatic(
+      duration,
+      playerCount,
+      expectedItemId,
+      expectedItemQuantity,
+      expectedControlDepositId,
+      lastResetTime
+    );
 
     PackedCounter _encodedLengths;
     bytes memory _dynamicData;

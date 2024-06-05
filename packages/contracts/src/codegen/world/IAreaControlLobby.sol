@@ -8,19 +8,23 @@ pragma solidity >=0.8.24;
  * @dev This interface is automatically generated from the corresponding system contract. Do not edit manually.
  */
 interface IAreaControlLobby {
-  function action__setLobbyConfig(
+  function king__setLobbyConfig(
     uint256 _smartObjectId,
     uint256 _duration,
     uint256 _playerCount,
     uint256 _expectedItemId,
-    uint256 _expectedItemQuantity
+    uint256 _expectedItemQuantity,
+    uint256 _expectedControlDepositId,
+    address[] memory _controlPoints
   ) external;
 
-  function action__acResetGame(uint256 _smartObjectId) external;
+  function king__acResetGame(uint256 _smartObjectId) external;
 
-  function action__acJoinGame(uint256 _smartObjectId, uint256 _team) external;
+  function king__acJoinGame(uint256 _smartObjectId, uint256 _team) external;
 
-  function action__acStartGame(uint256 _smartObjectId) external;
+  function king__acStartGame(uint256 _smartObjectId) external;
 
-  function action__acClaimPrize(uint256 _smartObjectId) external;
+  function king__acClaimPrize(uint256 _smartObjectId) external;
+
+  function king__getLobbyStatus(uint256 _smartObjectId) external view;
 }
