@@ -5,6 +5,12 @@ import OngoingGameInfo from "./OngoingGameInfo";
 export interface IAreaControlData {
   teamACount: number;
   teamBCount: number;
+  taken?: boolean;
+  taker?: "A" | "B";
+  teamAScore?: number;
+  teamBScore?: number;
+  userTeam?: "A" | "B";
+  haveToken?: boolean;
 }
 
 export interface AreaControlProps {
@@ -17,7 +23,7 @@ const AreaControl: React.FC<AreaControlProps> = ({ data }: AreaControlProps): JS
   return (
     <>
       { !hasStarted && <Setup data={data} hasStarted={hasStarted} setHasStarted={setHasStarted} /> }
-      { hasStarted && <OngoingGameInfo /> }
+      { hasStarted && <OngoingGameInfo data={data} /> }
     </>
   )
 }

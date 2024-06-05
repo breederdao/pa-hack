@@ -1,4 +1,6 @@
 import MainButton from "./components/buttons/MainButton"
+import Data from "./components/typography/Data";
+import Label from "./components/typography/Label";
 
 export interface IKingOfTheHillData {
   timer?: number;
@@ -12,21 +14,21 @@ interface KingOfTheHillProps {
   data: IKingOfTheHillData;
 }
 
-const KingOfTheHill: React.FC<KingOfTheHillProps> = ({ data }): JSX.Element => {
+const KingOfTheHill: React.FC<KingOfTheHillProps> = ({ data }: KingOfTheHillProps): JSX.Element => {
   return (
     <>
       <div className='border-[1px] border-dusty-orange mb-6'>
-        <h3 className="text-walnut text-base leading-6 font-normal text-center">Prize pool</h3>
-        <h2 className='text-dusty-orange font-normal text-3xl leading-[38px] text-center border-b-2 border-dusty-orange'>1 Frontier Chip/s</h2>
+        <Label>Prize pool</Label>
+        <Data>1 Frontier Chip/s</Data>
         
         <div className='flex flex-row justify-between'>
           <div className='w-1/2 border-r border-dusty-orange'>
-            <h3 className="text-walnut text-base leading-6 font-normal text-center">Timer</h3>
-            <h2 className='text-dusty-orange font-normal text-3xl leading-[38px] text-center'>--:--</h2>
+            <Label>Timer</Label>
+            <Data>--:--</Data>
           </div>
           <div className='w-1/2 border-l border-dusty-orange'>
-            <h3 className="text-walnut text-base leading-6 font-normal text-center">Running Time</h3>
-            <h2 className='text-dusty-orange font-normal text-3xl leading-[38px] text-center'>--:--:--</h2>
+            <Label>Running Time</Label>
+            <Data>--:--:--</Data>
           </div>
         </div>
       </div>

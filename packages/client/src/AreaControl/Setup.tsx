@@ -2,6 +2,8 @@ import { useEffect, useState } from "react"
 import StartGameButton from "./StartGameButton"
 import { IAreaControlData } from "./AreaControl"
 import PickTeamButton from "./PickTeamButton"
+import Label from "../components/typography/Label";
+import Data from "../components/typography/Data";
 
 interface ISetup {
   data: IAreaControlData;
@@ -23,8 +25,8 @@ const Setup: React.FC<ISetup> = ({ data, hasStarted, setHasStarted }: ISetup): J
     <>
       <div className="mb-8">
         <div className="bg-[#010001] border border-dusty-orange mb-6">
-          <h3 className="text-walnut font-normal text-base leading-6 text-center">Prize pool</h3>
-          <h2 className="text-dusty-orange font-normal text-3xl leading-[38px] text-center">5 frontier chip/s</h2>
+          <Label>Prize pool</Label>
+          <Data>5 frontier chip/s</Data>
         </div>
 
         <h4 className="font-bold text-base leading-6 mb-[10px]">Rules</h4>

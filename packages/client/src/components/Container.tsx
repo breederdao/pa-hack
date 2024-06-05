@@ -18,7 +18,7 @@ const Container: React.FC<ContainerProps> = ({ children, title }) => {
       <div className='relative w-[528px] border-dusty-orange border-[5px] text-dusty-orange bg-repeat font-courier
         before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-b before:from-night before:from-10% before:to-cedar before:to-90% bg-[url(images/container-bg.png)] before:z-[-1]'>
         <Header title={title} />
-        <div className='px-10 pt-[26px] pb-[57px]'>
+        <div className='px-10 pt-[26px] pb-[57px] min-h-[565px]'>
           {children}
         </div>
         <Footer />
@@ -52,25 +52,25 @@ const Footer = () => {
         Copyright
       </div>
       <div className='w-1/2 flex justify-end items-center [&>*]:mr-[16.67px] [&>:last-child]:mr-0'>
-        <a href="#">
+        <a href="#" target='_blank'>
           <WebBrowserIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <TwitterIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <DiscordIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <TiktokIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <TelegramIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <LinkedInIcon />
         </a>
-        <a href="#">
+        <a href="#" target='_blank'>
           <MediumIcon />
         </a>
       </div>

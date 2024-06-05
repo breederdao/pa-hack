@@ -16,7 +16,15 @@ export const App = () => {
   const areaControlData: IAreaControlData = {
     teamACount: 2,
     teamBCount: 2,
+    taken: true,
+    taker: "B",
+    teamAScore: 3600*24,
+    teamBScore: 3600*12,
+    userTeam: "A",
+    haveToken: false,
   }
+
+  
 
   return (
     <>
