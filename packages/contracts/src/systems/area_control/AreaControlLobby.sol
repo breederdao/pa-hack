@@ -32,6 +32,8 @@ contract AreaControlLobby is System {
     using InventoryUtils for bytes14;
     using SmartDeployableUtils for bytes14;
 
+    address[] controlPoints;
+
     // resetTime => address => 1=A, 2=B
     mapping(uint256 => mapping(address => uint256)) public team;
 
@@ -55,7 +57,8 @@ contract AreaControlLobby is System {
         uint256 _duration,
         uint256 _playerCount,
         uint256 _expectedItemId,
-        uint256 _expectedItemQuantity
+        uint256 _expectedItemQuantity,
+        address[] memory _controlPoints
     ) public onlySSUOwner(_smartObjectId) {
         // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
@@ -70,6 +73,8 @@ contract AreaControlLobby is System {
                 _expectedItemId
             );
         }
+
+        controlPoints = _controlPoints;
 
         _resetGame(_smartObjectId);
 
@@ -156,11 +161,11 @@ contract AreaControlLobby is System {
         ACLobbyStatus.setStartTime(_smartObjectId, resetTime, 0); 
     }
 
-    function _getLobbyConfig(uint256 _smartObjectId) internal returns (ACLobbyConfigData memory) {
+    function _getLobbyConfig(uint256 _smartObjectId) internal view returns (ACLobbyConfigData memory) {
         return ACLobbyConfig.get(_smartObjectId);
     }
 
-    function _getCurrentLobbyStatus(uint256 _smartObjectId) internal returns (ACLobbyStatusData memory) {
+    function _getCurrentLobbyStatus(uint256 _smartObjectId) internal view returns (ACLobbyStatusData memory) {
         return ACLobbyStatus.get(_smartObjectId, _getLobbyConfig(_smartObjectId).lastResetTime);
     }
 
