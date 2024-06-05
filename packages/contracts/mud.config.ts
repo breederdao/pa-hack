@@ -7,6 +7,10 @@ export default mudConfig({
       name: 'KingOfTheHill',
       openAccess: true,
     },
+    AreaControlLobby: {
+      name: 'AreaControlLobby',
+      openAccess: true,
+    },
   },
   tables: {
     KingOfTheHillConfig: {
@@ -33,5 +37,31 @@ export default mudConfig({
         claimed: 'bool',
       },
     },
+    ACLobbyConfig: {
+      keySchema: {
+        smartObjectId: 'uint256'
+      },
+      valueSchema: {
+        duration: 'uint256',
+        playerCount: 'uint256',
+        expectedItemId: 'uint256',
+        expectedItemQuantity: 'uint256',
+        lastResetTime: 'uint256'
+      }
+    },
+    ACLobbyStatus: {
+      keySchema: {
+        smartObjectId: 'uint256',
+        lastResetTime: 'uint256'
+      },
+      valueSchema: {
+        startTime: 'uint256',
+        teamATotalTime: 'uint256',
+        teamBTotalTime: 'uint256',
+        teamAPlayers: 'uint256',
+        teamBPlayers: 'uint256',
+        claimed: "bool"
+      }
+    }
   },
 })
