@@ -26,13 +26,17 @@ import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@ev
 import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
 import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
 
+interface IAreaControlPoint {
+    function getTimeControlled(uint256 _resetTime) external view returns(uint256 teamATime, uint256 teamBTime);
+}
+
 contract AreaControlLobby is System {
     using InventoryLib for InventoryLib.World;
     using EntityRecordUtils for bytes14;
     using InventoryUtils for bytes14;
     using SmartDeployableUtils for bytes14;
 
-    address[] controlPoints;
+    IAreaControlPoint public areaControlPoint;
 
     // resetTime => address => 1=A, 2=B
     mapping(uint256 => mapping(address => uint256)) public team;
@@ -59,7 +63,7 @@ contract AreaControlLobby is System {
         uint256 _expectedItemId,
         uint256 _expectedItemQuantity,
         uint256 _expectedControlDepositId,
-        address[] memory _controlPoints
+        address _areaControlPoint
     ) public onlySSUOwner(_smartObjectId) {
         // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
@@ -75,7 +79,7 @@ contract AreaControlLobby is System {
             );
         }
 
-        controlPoints = _controlPoints;
+        areaControlPoint = IAreaControlPoint(_areaControlPoint);
 
         _resetGame(_smartObjectId);
 
@@ -92,6 +96,11 @@ contract AreaControlLobby is System {
         ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
+
+        require(
+            acLobbyStatusData.startTime + acLobbyConfigData.duration >= block.timestamp,
+            "AreaControlPoint.claimPoint: game is ongoing"
+        );
 
         require(_team <= 2, "AreaControlLobby.acJoinGame: invalid team");
         
@@ -123,7 +132,7 @@ contract AreaControlLobby is System {
         InventoryItem[] memory inItems = new InventoryItem[](1);
         inItems[0] = InventoryItem(
             expectedItemId,
-            msg.sender,
+            _msgSender(),
             itemInEntity.typeId,
             itemInEntity.itemId,
             itemInEntity.volume,
@@ -150,6 +159,50 @@ contract AreaControlLobby is System {
     }
 
     function acClaimPrize(uint256 _smartObjectId) public {
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
+
+        uint256 teamStatus = isPlayer(_msgSender());
+
+        require(
+            acLobbyStatusData.startTime + acLobbyConfigData.duration >= block.timestamp,
+            "AreaControlPoint.claimPoint: game is ongoing"
+        );
+
+        require(
+            !acLobbyStatusData.claimed, "AreaControlPoint.claimPoint: already claimed"
+        );
+
+        (uint256 teamATime, uint256 teamBTime) = areaControlPoint.getTimeControlled(
+            acLobbyConfigData.lastResetTime
+        );
+
+        if(teamATime > teamBTime) {
+            require(teamStatus == 1, "AreaControlPoint.claimPoint: not winning team");
+        } else {
+            require(teamStatus == 2, "AreaControlPoint.claimPoint: not winning team");
+        }
+
+        // giving item
+        uint256 expectedItemId = acLobbyConfigData.expectedItemId;
+        uint256 totalItemCount = acLobbyConfigData.expectedItemQuantity * acLobbyConfigData.playerCount * 2; // items * players per team * 2 teams
+        EntityRecordTableData memory itemOutEntity = EntityRecordTable.get(
+            _namespace().entityRecordTableId(),
+            expectedItemId
+        );
+
+        InventoryItem[] memory outItems = new InventoryItem[](1);
+        outItems[0] = InventoryItem(
+            expectedItemId,
+            _msgSender(),
+            itemOutEntity.typeId,
+            itemOutEntity.itemId,
+            itemOutEntity.volume,
+            totalItemCount
+        );
+        _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
+
+        ACLobbyStatus.setClaimed(_smartObjectId, acLobbyConfigData.lastResetTime, true);
 
     }
 

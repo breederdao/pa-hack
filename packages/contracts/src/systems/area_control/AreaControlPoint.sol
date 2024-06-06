@@ -38,7 +38,7 @@ contract AreaControlPoint is System {
     IAreaControlLobby public ACLobby;
 
     // resetTime => team 1/2 => time
-    mapping(uint256 => mapping(uint256 => uint256)) timeControl;
+    mapping(uint256 => mapping(uint256 => uint256)) private timeControl;
 
     mapping(uint256 => mapping(uint256 => uint256)) controllingTeam; // ssu => resetTime => team 1/2
     mapping(uint256 => mapping(uint256 => uint256)) lastControlChange; // ssu => resetTime => time of control change
@@ -78,5 +78,9 @@ contract AreaControlPoint is System {
         // change control and log time
         controllingTeam[_smartObjectId][resetTime] = isPlayer;
         lastControlChange[_smartObjectId][resetTime] = block.timestamp;
+    }
+
+    function getTimeControlled(uint256 _resetTime) public view returns(uint256 teamATime, uint256 teamBTime) {
+        return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
     }
 }
