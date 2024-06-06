@@ -27,8 +27,7 @@ interface IAreaControlLobby {
     function getGameSettings(uint256 _smartObjectId) external view returns (
         uint256 duration, 
         uint256 startTime,
-        uint256 resetTime,
-        uint256 expectedControlDepositId
+        uint256 resetTime
     );
 
     function isPlayer(uint256 _smartObjectId, address _player) external view returns (uint256);
@@ -52,8 +51,7 @@ contract AreaControlPoint is System {
         (
             uint256 duration, 
             uint256 startTime, 
-            uint256 resetTime,
-            uint256 expectedControlDepositId
+            uint256 resetTime
         ) = ACLobby.getGameSettings(_lobbySmartObjectId);
 
         uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
@@ -80,7 +78,18 @@ contract AreaControlPoint is System {
         lastControlChange[_smartObjectId][resetTime] = block.timestamp;
     }
 
+    // returns totalTimeControlled, only accurate if game was ended
     function getTimeControlled(uint256 _resetTime) public view returns(uint256 teamATime, uint256 teamBTime) {
         return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
+    }
+
+    // returns controlling team 1=A 2=B
+    function getControllingTeam(
+        uint256 _smartObjectId, 
+        uint256 _lobbySmartObjectId
+    ) public returns (uint256){
+        ( , ,uint256 resetTime) = ACLobby.getGameSettings(_lobbySmartObjectId);
+
+        return controllingTeam[_smartObjectId][resetTime];
     }
 }

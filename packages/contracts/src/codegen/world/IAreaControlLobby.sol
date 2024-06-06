@@ -28,7 +28,11 @@ interface IAreaControlLobby {
 
   function king__getGameSettings(
     uint256 _smartObjectId
-  ) external view returns (uint256 duration, uint256 startTime, uint256 resetTime, uint256 expectedControlDepositId);
+  ) external view returns (uint256 duration, uint256 startTime, uint256 resetTime);
+
+  function king__getTeamPlayers(
+    uint256 _smartObjectId
+  ) external view returns (address[] memory teamAPlayers, address[] memory teamBPlayers);
 
   function king__isPlayer(uint256 _smartObjectId, address _player) external view returns (uint256);
 }
