@@ -40,6 +40,8 @@ contract AreaControlLobby is System {
 
     // resetTime => address => 1=A, 2=B
     mapping(uint256 => mapping(address => uint256)) public team;
+    // resetTime => 1=A, 2=B => address[]
+    mapping(uint256 => mapping(uint256 => address[])) public playersInTeam;
 
     modifier onlySSUOwner(uint256 _smartObjectId) {
         address ssuOwner = IERC721(
@@ -122,6 +124,8 @@ contract AreaControlLobby is System {
 
         // setting team
         team[lastResetTime][_msgSender()] = _team;
+        // adding to array
+        playersInTeam[lastResetTime][_team].push(_msgSender());
 
         // get item deposit
         uint256 expectedItemId = acLobbyConfigData.expectedItemId;
@@ -209,19 +213,31 @@ contract AreaControlLobby is System {
     function getGameSettings(uint256 _smartObjectId) public view returns (
         uint256 duration, 
         uint256 startTime,
-        uint256 resetTime,
-        uint256 expectedControlDepositId
+        uint256 resetTime
     ){
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
         ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
         return(
             acLobbyConfigData.duration, 
             acLobbyStatusData.startTime, 
-            acLobbyConfigData.lastResetTime, 
-            expectedControlDepositId
+            acLobbyConfigData.lastResetTime
         );
     }
 
+    // returns array of team players
+    function getTeamPlayers(uint256 _smartObjectId) public view returns (
+        address[] memory teamAPlayers,
+        address[] memory teamBPlayers
+    ){
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
+
+        return(
+            playersInTeam[acLobbyConfigData.lastResetTime][1],
+            playersInTeam[acLobbyConfigData.lastResetTime][2]
+        );
+    }
+
+    // returns 1 if A, 2 if B, 0 if non player
     function isPlayer(uint256 _smartObjectId, address _player) public view returns (uint256) {
         return team[_getLobbyConfig(_smartObjectId).lastResetTime][_player];
     }
