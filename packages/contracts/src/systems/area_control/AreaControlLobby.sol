@@ -153,8 +153,24 @@ contract AreaControlLobby is System {
 
     }
 
-    function getLobbyStatus(uint256 _smartObjectId) public view {
+    function getGameSettings(uint256 _smartObjectId) public view returns (
+        uint256 duration, 
+        uint256 startTime,
+        uint256 resetTime,
+        uint256 expectedControlDepositId
+    ){
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
+        return(
+            acLobbyConfigData.duration, 
+            acLobbyStatusData.startTime, 
+            acLobbyConfigData.lastResetTime, 
+            expectedControlDepositId
+        );
+    }
 
+    function isPlayer(uint256 _smartObjectId, address _player) public view returns (uint256) {
+        return team[_getLobbyConfig(_smartObjectId).lastResetTime][_player];
     }
 
     function _resetGame(uint256 _smartObjectId) internal {

@@ -23,9 +23,60 @@ import { Utils as InventoryUtils } from "@eveworld/world/src/modules/inventory/U
 import { Utils as SmartDeployableUtils } from "@eveworld/world/src/modules/smart-deployable/Utils.sol";
 import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@eveworld/common-constants/src/constants.sol";
 
+interface IAreaControlLobby {
+    function getGameSettings(uint256 _smartObjectId) external view returns (
+        uint256 duration, 
+        uint256 startTime,
+        uint256 resetTime,
+        uint256 expectedControlDepositId
+    );
 
+    function isPlayer(uint256 _smartObjectId, address _player) external view returns (uint256);
+}
 
 contract AreaControlPoint is System {
-    
+    IAreaControlLobby public ACLobby;
 
+    // resetTime => team 1/2 => time
+    mapping(uint256 => mapping(uint256 => uint256)) timeControl;
+
+    mapping(uint256 => mapping(uint256 => uint256)) controllingTeam; // ssu => resetTime => team 1/2
+    mapping(uint256 => mapping(uint256 => uint256)) lastControlChange; // ssu => resetTime => time of control change
+
+    // todo: access control separate from ssuOwner
+    function setACLobby(address _acLobby) public {
+        ACLobby = IAreaControlLobby(_acLobby);
+    }
+
+    function claimPoint(uint256 _smartObjectId, uint256 _lobbySmartObjectId) public {
+        (
+            uint256 duration, 
+            uint256 startTime, 
+            uint256 resetTime,
+            uint256 expectedControlDepositId
+        ) = ACLobby.getGameSettings(_lobbySmartObjectId);
+
+        uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
+
+        require(isPlayer > 0, "AreaControlPoint.claimPoint: not a player");
+
+        require(
+            startTime + duration >= block.timestamp,
+            "AreaControlPoint.claimPoint: no ongoing game"
+        );
+
+        if(controllingTeam[_smartObjectId][resetTime] > 0) {
+            require(
+                controllingTeam[_smartObjectId][resetTime] != isPlayer, 
+                "AreaControlPoint.claimPoint: point already controlled"
+            );
+
+            // add to totalTime
+            timeControl[resetTime][isPlayer] += block.timestamp - lastControlChange[_smartObjectId][resetTime];
+        }
+
+        // change control and log time
+        controllingTeam[_smartObjectId][resetTime] = isPlayer;
+        lastControlChange[_smartObjectId][resetTime] = block.timestamp;
+    }
 }

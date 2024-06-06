@@ -63,18 +63,6 @@ export default mudConfig({
         teamBPlayers: 'uint256',
         claimed: "bool"
       }
-    },
-    ACPointStatus: {
-      keySchema: {
-        smartObjectId: 'uint256',
-        lastResetTime: 'uint256'
-      },
-      valueSchema: {
-        controllingTeam: 'uint256',
-        lastControlChangeTime: 'uint256',
-        teamATime: 'uint256',
-        teamBTime: 'uint256'
-      }
     }
   },
 })

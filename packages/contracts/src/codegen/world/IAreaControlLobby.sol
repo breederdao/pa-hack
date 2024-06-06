@@ -26,5 +26,9 @@ interface IAreaControlLobby {
 
   function king__acClaimPrize(uint256 _smartObjectId) external;
 
-  function king__getLobbyStatus(uint256 _smartObjectId) external view;
+  function king__getGameSettings(
+    uint256 _smartObjectId
+  ) external view returns (uint256 duration, uint256 startTime, uint256 resetTime, uint256 expectedControlDepositId);
+
+  function king__isPlayer(uint256 _smartObjectId, address _player) external view returns (uint256);
 }
