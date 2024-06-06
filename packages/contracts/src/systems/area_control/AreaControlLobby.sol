@@ -162,7 +162,7 @@ contract AreaControlLobby is System {
         ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
 
-        uint256 teamStatus = isPlayer(_msgSender());
+        uint256 teamStatus = isPlayer(_smartObjectId, _msgSender());
 
         require(
             acLobbyStatusData.startTime + acLobbyConfigData.duration >= block.timestamp,

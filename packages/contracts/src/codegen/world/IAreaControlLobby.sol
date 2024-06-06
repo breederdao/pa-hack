@@ -15,7 +15,7 @@ interface IAreaControlLobby {
     uint256 _expectedItemId,
     uint256 _expectedItemQuantity,
     uint256 _expectedControlDepositId,
-    address[] memory _controlPoints
+    address _areaControlPoint
   ) external;
 
   function king__acResetGame(uint256 _smartObjectId) external;
