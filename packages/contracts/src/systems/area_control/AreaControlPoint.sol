@@ -23,18 +23,32 @@ import { Utils as InventoryUtils } from "@eveworld/world/src/modules/inventory/U
 import { Utils as SmartDeployableUtils } from "@eveworld/world/src/modules/smart-deployable/Utils.sol";
 import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@eveworld/common-constants/src/constants.sol";
 
-interface IAreaControlLobby {
-    function getGameSettings(uint256 _smartObjectId) external view returns (
-        uint256 duration, 
-        uint256 startTime,
-        uint256 resetTime
-    );
+import { ResourceId, WorldResourceIdLib, WorldResourceIdInstance } from "@latticexyz/world/src/WorldResourceId.sol";
 
-    function isPlayer(uint256 _smartObjectId, address _player) external view returns (uint256);
-}
+import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
+import { KOTH_NAMESPACE, AREA_CONTROL_LOBBY_SYSTEM_NAME } from "../../constant.sol";
+
+import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
+import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
+
+import { IAreaControlLobby } from "../../codegen/world/IAreaControlLobby.sol";
+
+// interface IAreaControlLobby {
+//     function getGameSettings(
+//         uint256 _smartObjectId
+//     )
+//         external
+//         view
+//         returns (uint256 duration, uint256 startTime, uint256 resetTime);
+
+//     function isPlayer(
+//         uint256 _smartObjectId,
+//         address _player
+//     ) external view returns (uint256);
+// }
 
 contract AreaControlPoint is System {
-    IAreaControlLobby public ACLobby;
+    // IAreaControlLobby public ACLobby;
 
     // resetTime => team 1/2 => time
     mapping(uint256 => mapping(uint256 => uint256)) private timeControl;
@@ -43,18 +57,34 @@ contract AreaControlPoint is System {
     mapping(uint256 => mapping(uint256 => uint256)) lastControlChange; // ssu => resetTime => time of control change
 
     // todo: access control separate from ssuOwner
-    function setACLobby(address _acLobby) public {
-        ACLobby = IAreaControlLobby(_acLobby);
-    }
+    // function setACLobby(address _acLobby) public {
+    //     ACLobby = IAreaControlLobby(_acLobby);
+    // }
 
-    function claimPoint(uint256 _smartObjectId, uint256 _lobbySmartObjectId) public {
-        (
-            uint256 duration, 
-            uint256 startTime, 
-            uint256 resetTime
-        ) = ACLobby.getGameSettings(_lobbySmartObjectId);
+    function claimPoint(
+        uint256 _smartObjectId,
+        uint256 _lobbySmartObjectId
+    ) public {
+        // IWorld world = IWorld(_world());
+        // (uint256 duration, uint256 startTime, uint256 resetTime) = ACLobby
+        //     .getGameSettings(_lobbySmartObjectId);
 
-        uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _smartObjectId
+        );
+
+        uint256 duration = acLobbyConfigData.duration;
+        uint256 startTime = acLobbyStatusData.startTime;
+        uint256 resetTime = acLobbyConfigData.lastResetTime;
+
+        // uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
+        uint256 isPlayer = IAreaControlLobby(_world()).nameHack1__isPlayer(
+            _lobbySmartObjectId,
+            _msgSender()
+        );
 
         require(isPlayer > 0, "AreaControlPoint.claimPoint: not a player");
 
@@ -63,14 +93,16 @@ contract AreaControlPoint is System {
             "AreaControlPoint.claimPoint: no ongoing game"
         );
 
-        if(controllingTeam[_smartObjectId][resetTime] > 0) {
+        if (controllingTeam[_smartObjectId][resetTime] > 0) {
             require(
-                controllingTeam[_smartObjectId][resetTime] != isPlayer, 
+                controllingTeam[_smartObjectId][resetTime] != isPlayer,
                 "AreaControlPoint.claimPoint: point already controlled"
             );
 
             // add to totalTime
-            timeControl[resetTime][isPlayer] += block.timestamp - lastControlChange[_smartObjectId][resetTime];
+            timeControl[resetTime][isPlayer] +=
+                block.timestamp -
+                lastControlChange[_smartObjectId][resetTime];
         }
 
         // change control and log time
@@ -79,17 +111,40 @@ contract AreaControlPoint is System {
     }
 
     // returns totalTimeControlled, only accurate if game was ended
-    function getTimeControlled(uint256 _resetTime) public view returns(uint256 teamATime, uint256 teamBTime) {
+    function getTimeControlled(
+        uint256 _resetTime
+    ) public view returns (uint256 teamATime, uint256 teamBTime) {
         return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
     }
 
     // returns controlling team 1=A 2=B
     function getControllingTeam(
-        uint256 _smartObjectId, 
+        uint256 _smartObjectId,
         uint256 _lobbySmartObjectId
-    ) public returns (uint256){
-        ( , ,uint256 resetTime) = ACLobby.getGameSettings(_lobbySmartObjectId);
+    ) public returns (uint256) {
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
+        uint256 resetTime = acLobbyConfigData.lastResetTime;
+        // (, , uint256 resetTime) = IAreaControlLobby(_world())
+        //     .hack007__getGameSettings(_lobbySmartObjectId);
 
         return controllingTeam[_smartObjectId][resetTime];
+    }
+
+    function _getLobbyConfig(
+        uint256 _smartObjectId
+    ) internal view returns (ACLobbyConfigData memory) {
+        return ACLobbyConfig.get(_smartObjectId);
+    }
+
+    function _getCurrentLobbyStatus(
+        uint256 _smartObjectId
+    ) internal view returns (ACLobbyStatusData memory) {
+        return
+            ACLobbyStatus.get(
+                _smartObjectId,
+                _getLobbyConfig(_smartObjectId).lastResetTime
+            );
     }
 }

@@ -26,9 +26,13 @@ import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@ev
 import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
 import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
 
-interface IAreaControlPoint {
-    function getTimeControlled(uint256 _resetTime) external view returns(uint256 teamATime, uint256 teamBTime);
-}
+import { IAreaControlPoint } from "../../codegen/world/IAreaControlPoint.sol";
+
+// interface IAreaControlPoint {
+//     function getTimeControlled(
+//         uint256 _resetTime
+//     ) external view returns (uint256 teamATime, uint256 teamBTime);
+// }
 
 contract AreaControlLobby is System {
     using InventoryLib for InventoryLib.World;
@@ -81,45 +85,71 @@ contract AreaControlLobby is System {
             );
         }
 
-        areaControlPoint = IAreaControlPoint(_areaControlPoint);
+        // areaControlPoint = IAreaControlPoint(_areaControlPoint);
 
         _resetGame(_smartObjectId);
 
-        ACLobbyConfig.set(_smartObjectId, _duration, _playerCount, _expectedItemId, _expectedItemQuantity, _expectedControlDepositId, 0);
+        ACLobbyConfig.set(
+            _smartObjectId,
+            _duration,
+            _playerCount,
+            _expectedItemId,
+            _expectedItemQuantity,
+            _expectedControlDepositId,
+            0
+        );
     }
 
-    function acResetGame(uint256 _smartObjectId) public onlySSUOwner(_smartObjectId) {
+    function acResetGame(
+        uint256 _smartObjectId
+    ) public onlySSUOwner(_smartObjectId) {
         _resetGame(_smartObjectId);
     }
 
     // _team 1=A, 2=B
     function acJoinGame(uint256 _smartObjectId, uint256 _team) public {
-        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
-        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _smartObjectId
+        );
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
         require(
-            acLobbyStatusData.startTime + acLobbyConfigData.duration >= block.timestamp,
+            acLobbyStatusData.startTime + acLobbyConfigData.duration >=
+                block.timestamp,
             "AreaControlPoint.claimPoint: game is ongoing"
         );
 
         require(_team <= 2, "AreaControlLobby.acJoinGame: invalid team");
-        
-        require(team[lastResetTime][_msgSender()] == 0, "AreaControlLobby.acJoinGame: already in team");
 
-        if(_team == 1) {
+        require(
+            team[lastResetTime][_msgSender()] == 0,
+            "AreaControlLobby.acJoinGame: already in team"
+        );
+
+        if (_team == 1) {
             require(
-                acLobbyStatusData.teamAPlayers < acLobbyConfigData.playerCount, 
+                acLobbyStatusData.teamAPlayers < acLobbyConfigData.playerCount,
                 "AreaControlLobby.acJoinGame: team is full"
             );
-            ACLobbyStatus.setTeamAPlayers(_smartObjectId, lastResetTime, acLobbyStatusData.teamAPlayers + 1);
+            ACLobbyStatus.setTeamAPlayers(
+                _smartObjectId,
+                lastResetTime,
+                acLobbyStatusData.teamAPlayers + 1
+            );
         } else if (_team == 2) {
             require(
-                acLobbyStatusData.teamBPlayers < acLobbyConfigData.playerCount, 
+                acLobbyStatusData.teamBPlayers < acLobbyConfigData.playerCount,
                 "AreaControlLobby.acJoinGame: team is full"
             );
-            ACLobbyStatus.setTeamBPlayers(_smartObjectId, lastResetTime, acLobbyStatusData.teamBPlayers + 1);
+            ACLobbyStatus.setTeamBPlayers(
+                _smartObjectId,
+                lastResetTime,
+                acLobbyStatusData.teamBPlayers + 1
+            );
         }
 
         // setting team
@@ -146,50 +176,80 @@ contract AreaControlLobby is System {
     }
 
     function acStartGame(uint256 _smartObjectId) public {
-        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
-        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _smartObjectId
+        );
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
-        require(team[lastResetTime][_msgSender()] > 0, "AreaControlLobby.acStartGame: not part of game");
+        require(
+            team[lastResetTime][_msgSender()] > 0,
+            "AreaControlLobby.acStartGame: not part of game"
+        );
         require(
             acLobbyStatusData.teamAPlayers == acLobbyConfigData.playerCount &&
-            acLobbyStatusData.teamBPlayers == acLobbyConfigData.playerCount,
+                acLobbyStatusData.teamBPlayers == acLobbyConfigData.playerCount,
             "AreaControlLobby.acStartGame: not enough players"
         );
-        require(acLobbyStatusData.startTime == 0, "AreaControlLobby.acStartGame: game already started");
+        require(
+            acLobbyStatusData.startTime == 0,
+            "AreaControlLobby.acStartGame: game already started"
+        );
 
-        ACLobbyStatus.setStartTime(_smartObjectId, lastResetTime, block.timestamp);
+        ACLobbyStatus.setStartTime(
+            _smartObjectId,
+            lastResetTime,
+            block.timestamp
+        );
     }
 
     function acClaimPrize(uint256 _smartObjectId) public {
-        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
-        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _smartObjectId
+        );
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
 
         uint256 teamStatus = isPlayer(_smartObjectId, _msgSender());
 
         require(
-            acLobbyStatusData.startTime + acLobbyConfigData.duration >= block.timestamp,
+            acLobbyStatusData.startTime + acLobbyConfigData.duration >=
+                block.timestamp,
             "AreaControlPoint.claimPoint: game is ongoing"
         );
 
         require(
-            !acLobbyStatusData.claimed, "AreaControlPoint.claimPoint: already claimed"
+            !acLobbyStatusData.claimed,
+            "AreaControlPoint.claimPoint: already claimed"
         );
 
-        (uint256 teamATime, uint256 teamBTime) = areaControlPoint.getTimeControlled(
-            acLobbyConfigData.lastResetTime
-        );
+        // @todo change this
+        // (uint256 teamATime, uint256 teamBTime) = areaControlPoint
+        //     .getTimeControlled(acLobbyConfigData.lastResetTime);
 
-        if(teamATime > teamBTime) {
-            require(teamStatus == 1, "AreaControlPoint.claimPoint: not winning team");
+        (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
+            .nameHack1__getTimeControlled(acLobbyConfigData.lastResetTime);
+        if (teamATime > teamBTime) {
+            require(
+                teamStatus == 1,
+                "AreaControlPoint.claimPoint: not winning team"
+            );
         } else {
-            require(teamStatus == 2, "AreaControlPoint.claimPoint: not winning team");
+            require(
+                teamStatus == 2,
+                "AreaControlPoint.claimPoint: not winning team"
+            );
         }
 
         // giving item
         uint256 expectedItemId = acLobbyConfigData.expectedItemId;
-        uint256 totalItemCount = acLobbyConfigData.expectedItemQuantity * acLobbyConfigData.playerCount * 2; // items * players per team * 2 teams
+        uint256 totalItemCount = acLobbyConfigData.expectedItemQuantity *
+            acLobbyConfigData.playerCount *
+            2; // items * players per team * 2 teams
         EntityRecordTableData memory itemOutEntity = EntityRecordTable.get(
             _namespace().entityRecordTableId(),
             expectedItemId
@@ -206,39 +266,56 @@ contract AreaControlLobby is System {
         );
         _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
 
-        ACLobbyStatus.setClaimed(_smartObjectId, acLobbyConfigData.lastResetTime, true);
-
+        ACLobbyStatus.setClaimed(
+            _smartObjectId,
+            acLobbyConfigData.lastResetTime,
+            true
+        );
     }
 
-    function getGameSettings(uint256 _smartObjectId) public view returns (
-        uint256 duration, 
-        uint256 startTime,
-        uint256 resetTime
-    ){
-        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
-        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
-        return(
-            acLobbyConfigData.duration, 
-            acLobbyStatusData.startTime, 
+    function getGameSettings(
+        uint256 _smartObjectId
+    )
+        public
+        view
+        returns (uint256 duration, uint256 startTime, uint256 resetTime)
+    {
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _smartObjectId
+        );
+        return (
+            acLobbyConfigData.duration,
+            acLobbyStatusData.startTime,
             acLobbyConfigData.lastResetTime
         );
     }
 
     // returns array of team players
-    function getTeamPlayers(uint256 _smartObjectId) public view returns (
-        address[] memory teamAPlayers,
-        address[] memory teamBPlayers
-    ){
-        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(_smartObjectId);
+    function getTeamPlayers(
+        uint256 _smartObjectId
+    )
+        public
+        view
+        returns (address[] memory teamAPlayers, address[] memory teamBPlayers)
+    {
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _smartObjectId
+        );
 
-        return(
+        return (
             playersInTeam[acLobbyConfigData.lastResetTime][1],
             playersInTeam[acLobbyConfigData.lastResetTime][2]
         );
     }
 
     // returns 1 if A, 2 if B, 0 if non player
-    function isPlayer(uint256 _smartObjectId, address _player) public view returns (uint256) {
+    function isPlayer(
+        uint256 _smartObjectId,
+        address _player
+    ) public view returns (uint256) {
         return team[_getLobbyConfig(_smartObjectId).lastResetTime][_player];
     }
 
@@ -247,16 +324,24 @@ contract AreaControlLobby is System {
         uint256 resetTime = block.timestamp;
         ACLobbyConfig.setLastResetTime(_smartObjectId, resetTime);
 
-        ACLobbyStatus.setClaimed(_smartObjectId, resetTime, false); 
-        ACLobbyStatus.setStartTime(_smartObjectId, resetTime, 0); 
+        ACLobbyStatus.setClaimed(_smartObjectId, resetTime, false);
+        ACLobbyStatus.setStartTime(_smartObjectId, resetTime, 0);
     }
 
-    function _getLobbyConfig(uint256 _smartObjectId) internal view returns (ACLobbyConfigData memory) {
+    function _getLobbyConfig(
+        uint256 _smartObjectId
+    ) internal view returns (ACLobbyConfigData memory) {
         return ACLobbyConfig.get(_smartObjectId);
     }
 
-    function _getCurrentLobbyStatus(uint256 _smartObjectId) internal view returns (ACLobbyStatusData memory) {
-        return ACLobbyStatus.get(_smartObjectId, _getLobbyConfig(_smartObjectId).lastResetTime);
+    function _getCurrentLobbyStatus(
+        uint256 _smartObjectId
+    ) internal view returns (ACLobbyStatusData memory) {
+        return
+            ACLobbyStatus.get(
+                _smartObjectId,
+                _getLobbyConfig(_smartObjectId).lastResetTime
+            );
     }
 
     function _inventoryLib() internal view returns (InventoryLib.World memory) {

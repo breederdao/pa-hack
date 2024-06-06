@@ -35,15 +35,15 @@ contract ACSetLobbyConfig is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        IAreaControlLobby(worldAddress).namespace__setLobbyConfig(
-            _smartObjectId, // SSU ID
-            _duration, // duration in seconds
-            _playerCount,
-            _expectedItemId,
-            _expectedItemQuantity,
-            _expectedControlDepositId, // set to zero
-            _areaControlPoint // address of area point
-        );
+        // IAreaControlLobby(worldAddress).namespace__setLobbyConfig(
+        //     _smartObjectId, // SSU ID
+        //     _duration, // duration in seconds
+        //     _playerCount,
+        //     _expectedItemId,
+        //     _expectedItemQuantity,
+        //     _expectedControlDepositId, // set to zero
+        //     _areaControlPoint // address of area point
+        // );
 
         vm.stopBroadcast();
     }
