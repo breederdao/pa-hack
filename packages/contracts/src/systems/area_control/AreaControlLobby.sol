@@ -232,7 +232,7 @@ contract AreaControlLobby is System {
         //     .getTimeControlled(acLobbyConfigData.lastResetTime);
 
         (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
-            .nameHack1__getTimeControlled(acLobbyConfigData.lastResetTime);
+            .kothTestV1__getTimeControlled(acLobbyConfigData.lastResetTime);
         if (teamATime > teamBTime) {
             require(
                 teamStatus == 1,
