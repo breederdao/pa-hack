@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'king',
+  namespace: 'kothTestV1',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',
@@ -11,6 +11,10 @@ export default mudConfig({
       name: 'AreaControlLobby',
       openAccess: true,
     },
+    AreaControlPoint: {
+      name: 'AreaControlPoint',
+      openAccess: true,
+    },
   },
   tables: {
     KingOfTheHillConfig: {
@@ -18,16 +22,16 @@ export default mudConfig({
         smartObjectId: 'uint256',
       },
       valueSchema: {
-        duration: "uint256",
-        expectedItemId: "uint256", // item required
-        expectedItemIncrement: "uint256",
-        lastResetTime: "uint256" // based on startTime
+        duration: 'uint256',
+        expectedItemId: 'uint256', // item required
+        expectedItemIncrement: 'uint256',
+        lastResetTime: 'uint256', // based on startTime
       },
     },
     KingOfTheHillStatus: {
       keySchema: {
-        smartObjectId: "uint256",
-        lastResetTime: "uint256" // id can be lastResetTime
+        smartObjectId: 'uint256',
+        lastResetTime: 'uint256', // id can be lastResetTime
       },
       valueSchema: {
         king: 'address',
@@ -39,7 +43,7 @@ export default mudConfig({
     },
     ACLobbyConfig: {
       keySchema: {
-        smartObjectId: 'uint256'
+        smartObjectId: 'uint256',
       },
       valueSchema: {
         duration: 'uint256',
@@ -47,13 +51,13 @@ export default mudConfig({
         expectedItemId: 'uint256',
         expectedItemQuantity: 'uint256',
         expectedControlDepositId: 'uint256',
-        lastResetTime: 'uint256'
-      }
+        lastResetTime: 'uint256',
+      },
     },
     ACLobbyStatus: {
       keySchema: {
         smartObjectId: 'uint256',
-        lastResetTime: 'uint256'
+        lastResetTime: 'uint256',
       },
       valueSchema: {
         startTime: 'uint256',
@@ -61,8 +65,8 @@ export default mudConfig({
         teamBTotalTime: 'uint256',
         teamAPlayers: 'uint256',
         teamBPlayers: 'uint256',
-        claimed: "bool"
-      }
-    }
+        claimed: 'bool',
+      },
+    },
   },
 })

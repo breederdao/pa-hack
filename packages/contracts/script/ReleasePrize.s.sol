@@ -19,7 +19,7 @@ contract ReleasePrize is Script {
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", smartStorageUnitId);
 
-        IKingOfTheHill(worldAddress).king__claimPrize(smartStorageUnitId);
+        // IKingOfTheHill(worldAddress).king__claimPrize(smartStorageUnitId);
 
         vm.stopBroadcast();
     }

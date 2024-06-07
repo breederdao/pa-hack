@@ -19,7 +19,7 @@ contract ClaimKing is Script {
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", smartStorageUnitId);
 
-        IKingOfTheHill(worldAddress).king__claimKing(smartStorageUnitId);
+        // IKingOfTheHill(worldAddress).king__claimKing(smartStorageUnitId);
 
         vm.stopBroadcast();
     }
