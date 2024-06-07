@@ -212,12 +212,12 @@ contract KingOfTheHill is System {
             itemOutEntity.volume,
             totalItemCount
         );
-        // _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
-        _inventoryLib().inventoryToEphemeralTransferWithParam(
-            _smartObjectId,
-            _msgSender(),
-            outItems
-        );
+        _inventoryLib().inventoryToEphemeralTransfer(_smartObjectId, outItems);
+        // _inventoryLib().inventoryToEphemeralTransferWithParam(
+        //     _smartObjectId,
+        //     _msgSender(),
+        //     outItems
+        // );
 
         // updating status to claimed
         KingOfTheHillStatus.setClaimed(_smartObjectId, resetTime, true);

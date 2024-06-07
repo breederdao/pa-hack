@@ -1,20 +1,20 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'kothTestV1',
+  namespace: 'bdpa_mark2',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',
       openAccess: true,
     },
-    AreaControlLobby: {
-      name: 'AreaControlLobby',
-      openAccess: true,
-    },
-    AreaControlPoint: {
-      name: 'AreaControlPoint',
-      openAccess: true,
-    },
+    // AreaControlLobby: {
+    //   name: 'AreaControlLobby',
+    //   openAccess: true,
+    // },
+    // AreaControlPoint: {
+    //   name: 'AreaControlPoint',
+    //   openAccess: true,
+    // },
   },
   tables: {
     KingOfTheHillConfig: {
