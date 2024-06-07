@@ -9,17 +9,26 @@
     "deploy:local": "pnpm run build && mud deploy",
     "deploy:testnet": "pnpm run build && mud deploy --profile=lattice-testnet",
     "dev": "pnpm mud dev-contracts",
+    "setup-koth": "source ./.env && pnpm forge script script/SetKingOfTheHillConfig.s.sol:SetKingOfTheHillConfig --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "claim-king": "source ./.env && pnpm forge script script/ClaimKing.s.sol:ClaimKing --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "claim-prize": "source ./.env && pnpm forge script script/ClaimPrize.s.sol:ClaimPrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "reset-game": "source ./.env && pnpm forge script script/ResetGame.s.sol:ResetGame --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "release-prize": "source ./.env && pnpm forge script script/ReleasePrize.s.sol:ReleasePrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "lint": "pnpm run prettier && pnpm run solhint",
     "prettier": "prettier --write 'src/**/*.sol'",
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix",
     "test": "tsc --noEmit && mud test"
   },
   "dependencies": {
-    "@latticexyz/cli": "2.0.11",
-    "@latticexyz/schema-type": "2.0.11",
-    "@latticexyz/store": "2.0.11",
-    "@latticexyz/world": "2.0.11",
-    "@latticexyz/world-modules": "2.0.11"
+    "@eveworld/common-constants": "^0.0.2",
+    "@eveworld/world": "^0.0.8",
+    "@latticexyz/cli": "2.0.0-next-17-awakening-9c07ab3a2",
+    "@latticexyz/schema-type": "2.0.0-next-17-awakening-9c07ab3a2",
+    "@latticexyz/store": "2.0.0-next-17-awakening-9c07ab3a2",
+    "@latticexyz/world": "2.0.0-next-17-awakening-9c07ab3a2",
+    "@latticexyz/world-modules": "2.0.0-next-17-awakening-9c07ab3a2",
+    "i": "^0.3.7",
+    "npm": "^10.8.0"
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
@@ -28,7 +37,7 @@
     "prettier": "3.2.5",
     "prettier-plugin-solidity": "1.3.1",
     "solhint": "^3.3.7",
-    "solhint-config-mud": "2.0.11",
-    "solhint-plugin-mud": "2.0.11"
+    "solhint-config-mud": "2.0.0-next-17-awakening-9c07ab3a2",
+    "solhint-plugin-mud": "2.0.0-next-17-awakening-9c07ab3a2"
   }
 }
