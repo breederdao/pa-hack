@@ -10,7 +10,7 @@ import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
 
 contract ACSetLobbyConfig is Script {
     function run(address worldAddress) external {
-        uint256 playerKey = vm.envUint("PRIVATE_KEY");
+        uint256 playerKey = vm.envUint("PLAYER_KEY");
         address player = vm.addr(playerKey);
         vm.startBroadcast(playerKey);
 
@@ -20,14 +20,7 @@ contract ACSetLobbyConfig is Script {
         // get ssu_id on env file
         uint256 _smartObjectId = vm.envUint("LOBBY_SSU_ID");
         console.log("LOBBY_SSU_ID", _smartObjectId);
-
-        // uint256 _duration = 60 * 60 * 24 * 1; // 1 day
-        uint256 _duration = 60 * 60 * 2; // 2hours
-        uint256 _playerCount = 2;
-        uint256 _expectedItemId = vm.envUint("ITEM_ID");
-        uint256 _expectedItemQuantity = 1;
-        uint256 _expectedControlDepositId = 0;
-        address _areaControlPoint = address(0); // @todo change this to AreaControlLobby address
+        uint256 _team = vm.envUint("TEAM");
 
         // uint256 _smartObjectId,
         //         uint256 _duration,
@@ -36,14 +29,9 @@ contract ACSetLobbyConfig is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        IAreaControlLobby(worldAddress).kothTestV1__setLobbyConfig(
+        IAreaControlLobby(worldAddress).kothTestV1__acJoinGame(
             _smartObjectId, // SSU ID
-            _duration, // duration in seconds
-            _playerCount,
-            _expectedItemId,
-            _expectedItemQuantity,
-            _expectedControlDepositId, // set to zero
-            _areaControlPoint // address of area point
+            _team
         );
 
         vm.stopBroadcast();
