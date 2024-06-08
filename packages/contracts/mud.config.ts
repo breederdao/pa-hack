@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'bdpa_mark2',
+  namespace: 'bdPaMark4',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',

@@ -28,7 +28,7 @@ contract SetKingOfTheHillConfig is Script {
         //     itemId,
         //     5 // increment by 5 every claim
         // );
-        IKingOfTheHill(worldAddress).bdpa_mark2__setKingOfTheHillConfig(
+        IKingOfTheHill(worldAddress).bdPaMark4__setKingOfTheHillConfig(
             smartStorageUnitId,
             3 minutes,
             itemId,

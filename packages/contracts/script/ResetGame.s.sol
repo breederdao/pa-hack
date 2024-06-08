@@ -19,7 +19,7 @@ contract ResetGame is Script {
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", smartStorageUnitId);
 
-        IKingOfTheHill(worldAddress).bdpa_mark2__resetGame(smartStorageUnitId, 0);
+        IKingOfTheHill(worldAddress).bdPaMark4__resetGame(smartStorageUnitId, 0);
 
         vm.stopBroadcast();
     }
