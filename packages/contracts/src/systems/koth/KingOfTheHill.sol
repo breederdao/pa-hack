@@ -124,10 +124,11 @@ contract KingOfTheHill is System {
             _namespace().entityRecordTableId(),
             expectedItemId
         );
+        // Commented this for test purposes
         InventoryItem[] memory inItems = new InventoryItem[](1);
         inItems[0] = InventoryItem(
             expectedItemId,
-            msg.sender,
+            _msgSender(),
             itemInEntity.typeId,
             itemInEntity.itemId,
             itemInEntity.volume,
