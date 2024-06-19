@@ -325,7 +325,11 @@ contract AreaControlLobby is System {
         ACLobbyConfig.setLastResetTime(_smartObjectId, resetTime);
 
         ACLobbyStatus.setClaimed(_smartObjectId, resetTime, false);
-        ACLobbyStatus.setStartTime(_smartObjectId, resetTime, 0);
+        ACLobbyStatus.setStartTime(
+            _smartObjectId,
+            resetTime,
+            resetTime + 5 days // move the time to the next day, this making sure that players can join the game
+        );
     }
 
     function _getLobbyConfig(
