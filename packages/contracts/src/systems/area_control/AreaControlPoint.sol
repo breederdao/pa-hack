@@ -121,7 +121,7 @@ contract AreaControlPoint is System {
     function getControllingTeam(
         uint256 _smartObjectId,
         uint256 _lobbySmartObjectId
-    ) public returns (uint256) {
+    ) public view returns (uint256) {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _smartObjectId
         );
