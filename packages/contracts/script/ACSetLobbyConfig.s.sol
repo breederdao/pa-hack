@@ -10,12 +10,12 @@ import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
 
 contract ACSetLobbyConfig is Script {
     function run(address worldAddress) external {
-        uint256 playerKey = vm.envUint("PLAYER_KEY");
-        address player = vm.addr(playerKey);
-        vm.startBroadcast(playerKey);
+        uint256 ssuOwner = vm.envUint("PRIVATE_KEY");
+        address owner = vm.addr(ssuOwner);
+        vm.startBroadcast(ssuOwner);
 
         console.log("world address:", worldAddress);
-        console.log("ssuOwner:", player);
+        console.log("ssuOwner:", owner);
 
         // get ssu_id on env file
         uint256 _smartObjectId = vm.envUint("SSU_ID");
@@ -35,15 +35,15 @@ contract ACSetLobbyConfig is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        // IAreaControlLobby(worldAddress).namespace__setLobbyConfig(
-        //     _smartObjectId, // SSU ID
-        //     _duration, // duration in seconds
-        //     _playerCount,
-        //     _expectedItemId,
-        //     _expectedItemQuantity,
-        //     _expectedControlDepositId, // set to zero
-        //     _areaControlPoint // address of area point
-        // );
+        IAreaControlLobby(worldAddress).kothTestV1__setLobbyConfig(
+            _smartObjectId, // SSU ID
+            _duration, // duration in seconds
+            _playerCount,
+            _expectedItemId,
+            _expectedItemQuantity,
+            _expectedControlDepositId, // set to zero
+            _areaControlPoint // address of area point
+        );
 
         vm.stopBroadcast();
     }
