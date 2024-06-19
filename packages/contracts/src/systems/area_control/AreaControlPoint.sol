@@ -21,17 +21,22 @@ import { EntityRecordTable, EntityRecordTableData } from "@eveworld/world/src/co
 import { Utils as EntityRecordUtils } from "@eveworld/world/src/modules/entity-record/Utils.sol";
 import { Utils as InventoryUtils } from "@eveworld/world/src/modules/inventory/Utils.sol";
 import { Utils as SmartDeployableUtils } from "@eveworld/world/src/modules/smart-deployable/Utils.sol";
+import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
+
 import { FRONTIER_WORLD_DEPLOYMENT_NAMESPACE as DEPLOYMENT_NAMESPACE } from "@eveworld/common-constants/src/constants.sol";
 
 import { ResourceId, WorldResourceIdLib, WorldResourceIdInstance } from "@latticexyz/world/src/WorldResourceId.sol";
 
-import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
-import { KOTH_NAMESPACE, AREA_CONTROL_LOBBY_SYSTEM_NAME } from "../../constant.sol";
-
 import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
 import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
 
+import { IWorld } from "../../codegen/world/IWorld.sol";
+
+import { KOTH_NAMESPACE } from "../constants.sol";
+import { Utils as KothUtils } from "./Utils.sol";
+
 import { IAreaControlLobby } from "../../codegen/world/IAreaControlLobby.sol";
+import { AreaControlLobby } from "./AreaControlLobby.sol";
 
 // interface IAreaControlLobby {
 //     function getGameSettings(
@@ -48,6 +53,7 @@ import { IAreaControlLobby } from "../../codegen/world/IAreaControlLobby.sol";
 // }
 
 contract AreaControlPoint is System {
+    using KothUtils for bytes14;
     // IAreaControlLobby public ACLobby;
 
     // resetTime => team 1/2 => time
@@ -65,15 +71,15 @@ contract AreaControlPoint is System {
         uint256 _smartObjectId,
         uint256 _lobbySmartObjectId
     ) public {
-        // IWorld world = IWorld(_world());
+        IWorld world = IWorld(_world());
         // (uint256 duration, uint256 startTime, uint256 resetTime) = ACLobby
         //     .getGameSettings(_lobbySmartObjectId);
 
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
-            _smartObjectId
+            _lobbySmartObjectId
         );
         ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
-            _smartObjectId
+            _lobbySmartObjectId
         );
 
         uint256 duration = acLobbyConfigData.duration;
@@ -81,9 +87,19 @@ contract AreaControlPoint is System {
         uint256 resetTime = acLobbyConfigData.lastResetTime;
 
         // uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
-        uint256 isPlayer = IAreaControlLobby(_world()).kothTestV1__isPlayer(
-            _lobbySmartObjectId,
-            _msgSender()
+        // uint256 isPlayer = IAreaControlLobby(_world()).kothTestV4__isPlayer(
+        //     _lobbySmartObjectId,
+        //     _msgSender()
+        // );
+        uint256 isPlayer = abi.decode(
+            world.call(
+                KOTH_NAMESPACE.lobbySystemId(),
+                abi.encodeCall(
+                    AreaControlLobby.isPlayer,
+                    (_lobbySmartObjectId, _msgSender())
+                )
+            ),
+            (uint256)
         );
 
         require(isPlayer > 0, "AreaControlPoint.claimPoint: not a player");
@@ -123,7 +139,7 @@ contract AreaControlPoint is System {
         uint256 _lobbySmartObjectId
     ) public view returns (uint256) {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
-            _smartObjectId
+            _lobbySmartObjectId
         );
         uint256 resetTime = acLobbyConfigData.lastResetTime;
         // (, , uint256 resetTime) = IAreaControlLobby(_world())
