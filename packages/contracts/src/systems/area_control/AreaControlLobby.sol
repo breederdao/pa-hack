@@ -15,7 +15,7 @@ import { IInventoryErrors } from "@eveworld/world/src/modules/inventory/IInvento
 import { DeployableTokenTable } from "@eveworld/world/src/codegen/tables/DeployableTokenTable.sol";
 import { InventoryItemTable } from "@eveworld/world/src/codegen/tables/InventoryItemTable.sol";
 import { EphemeralInvTable } from "@eveworld/world/src/codegen/tables/EphemeralInvTable.sol";
-import { EphemeralInvItemTable } from "@eveworld/world/src/codegen/tables/EphemeralInvItemTable.sol";
+import { EphemeralInvItemTable, EphemeralInvItemTableData } from "@eveworld/world/src/codegen/tables/EphemeralInvItemTable.sol";
 import { EntityRecordTable, EntityRecordTableData } from "@eveworld/world/src/codegen/tables/EntityRecordTable.sol";
 
 import { Utils as EntityRecordUtils } from "@eveworld/world/src/modules/entity-record/Utils.sol";
@@ -117,11 +117,11 @@ contract AreaControlLobby is System {
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
-        require(
-            acLobbyStatusData.startTime + acLobbyConfigData.duration >=
-                block.timestamp,
-            "AreaControlPoint.claimPoint: game is ongoing"
-        );
+        // require(
+        //     acLobbyStatusData.startTime + acLobbyConfigData.duration >=
+        //         block.timestamp,
+        //     "AreaControlPoint.claimPoint: game is ongoing"
+        // );
 
         require(_team <= 2, "AreaControlLobby.acJoinGame: invalid team");
 
@@ -232,7 +232,7 @@ contract AreaControlLobby is System {
         //     .getTimeControlled(acLobbyConfigData.lastResetTime);
 
         (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
-            .kothTestV1__getTimeControlled(acLobbyConfigData.lastResetTime);
+            .payBdPaMark1__getTimeControlled(acLobbyConfigData.lastResetTime);
         if (teamATime > teamBTime) {
             require(
                 teamStatus == 1,
@@ -271,6 +271,22 @@ contract AreaControlLobby is System {
             acLobbyConfigData.lastResetTime,
             true
         );
+    }
+
+    // Not working
+    // I added this for testing
+    function getItemsOnEphemeralInventory(
+        uint256 _smartObjectId,
+        uint256 _inventoryItemId
+    ) public view returns (uint256) {
+        EphemeralInvItemTableData memory table = EphemeralInvItemTable.get(
+            DEPLOYMENT_NAMESPACE.ephemeralInventoryItemTableId(),
+            _smartObjectId,
+            _inventoryItemId,
+            _msgSender()
+        );
+
+        return table.quantity;
     }
 
     function getGameSettings(

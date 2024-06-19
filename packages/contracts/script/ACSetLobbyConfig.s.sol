@@ -35,7 +35,7 @@ contract ACSetLobbyConfig is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        IAreaControlLobby(worldAddress).kothTestV1__setLobbyConfig(
+        IAreaControlLobby(worldAddress).payBdPaMark1__setLobbyConfig(
             _smartObjectId, // SSU ID
             _duration, // duration in seconds
             _playerCount,
