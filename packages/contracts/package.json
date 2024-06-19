@@ -16,7 +16,6 @@
     "release-prize": "source ./.env && pnpm forge script script/ReleasePrize.s.sol:ReleasePrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "ac-setup-lobby": "source ./.env && pnpm forge script script/ACSetLobbyConfig.s.sol:ACSetLobbyConfig --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "ac-join-game": "source ./.env && pnpm forge script script/ACJoinGame.s.sol:ACJoinGame --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
-    "ac-get-ephy-items": "source ./.env && pnpm forge script script/ACGetEphemeralInventoryItems.s.sol:ACGetEphemeralInventoryItems --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "lint": "pnpm run prettier && pnpm run solhint",
     "prettier": "prettier --write 'src/**/*.sol'",
     "solhint": "solhint --config ./.solhint.json 'src/**/*.sol' --fix",

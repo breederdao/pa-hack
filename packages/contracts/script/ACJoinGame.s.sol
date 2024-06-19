@@ -20,19 +20,6 @@ contract ACJoinGame is Script {
         console.log("smartStorageUnitId", _smartObjectId);
         console.log("team selected: ", _team);
 
-        // get the game settings
-        // (
-        //     uint256 duration,
-        //     uint256 startTime,
-        //     uint256 resetTime
-        // ) = IAreaControlLobby(worldAddress).payBdPaMark1__getGameSettings(
-        //         _smartObjectId
-        //     );
-
-        // console.log("duration: ", duration);
-        // console.log("start time: ", startTime);
-        // console.log("reset time:", resetTime);
-
         IAreaControlLobby(worldAddress).payBdPaMark1__acJoinGame(
             _smartObjectId, // SSU ID
             _team

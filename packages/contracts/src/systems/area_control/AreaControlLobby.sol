@@ -117,6 +117,7 @@ contract AreaControlLobby is System {
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
+        // @todo commented this because of the known bug
         // require(
         //     acLobbyStatusData.startTime + acLobbyConfigData.duration >=
         //         block.timestamp,
@@ -271,22 +272,6 @@ contract AreaControlLobby is System {
             acLobbyConfigData.lastResetTime,
             true
         );
-    }
-
-    // Not working
-    // I added this for testing
-    function getItemsOnEphemeralInventory(
-        uint256 _smartObjectId,
-        uint256 _inventoryItemId
-    ) public view returns (uint256) {
-        EphemeralInvItemTableData memory table = EphemeralInvItemTable.get(
-            DEPLOYMENT_NAMESPACE.ephemeralInventoryItemTableId(),
-            _smartObjectId,
-            _inventoryItemId,
-            _msgSender()
-        );
-
-        return table.quantity;
     }
 
     function getGameSettings(
