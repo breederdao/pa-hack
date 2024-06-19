@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'kothTestV1',
+  namespace: 'kothTestV4',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',
