@@ -87,7 +87,7 @@ contract AreaControlPoint is System {
         uint256 resetTime = acLobbyConfigData.lastResetTime;
 
         // uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
-        // uint256 isPlayer = IAreaControlLobby(_world()).kothTestV4__isPlayer(
+        // uint256 isPlayer = IAreaControlLobby(_world()).kothTestV5__isPlayer(
         //     _lobbySmartObjectId,
         //     _msgSender()
         // );

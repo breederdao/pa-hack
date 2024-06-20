@@ -248,7 +248,7 @@ contract AreaControlLobby is System {
         //     .getTimeControlled(acLobbyConfigData.lastResetTime);
 
         // (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
-        //     .kothTestV4__getTimeControlled(acLobbyConfigData.lastResetTime);
+        //     .kothTestV5__getTimeControlled(acLobbyConfigData.lastResetTime);
 
         (uint256 teamATime, uint256 teamBTime) = abi.decode(
             world.call(

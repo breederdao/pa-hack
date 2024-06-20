@@ -36,7 +36,7 @@ contract SetupGameLobby is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        IAreaControlLobby(worldAddress).kothTestV4__setLobbyConfig(
+        IAreaControlLobby(worldAddress).kothTestV5__setLobbyConfig(
             _smartObjectId, // SSU ID
             _duration, // duration in seconds
             _playerCount,
