@@ -28,6 +28,13 @@ import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbySt
 
 import { IAreaControlPoint } from "../../codegen/world/IAreaControlPoint.sol";
 
+import { IWorld } from "../../codegen/world/IWorld.sol";
+import { KOTH_NAMESPACE } from "../constants.sol";
+import { Utils as KothUtils } from "./Utils.sol";
+import { AreaControlPoint } from "./AreaControlPoint.sol";
+
+import { console } from "forge-std/console.sol";
+
 // interface IAreaControlPoint {
 //     function getTimeControlled(
 //         uint256 _resetTime
@@ -39,6 +46,7 @@ contract AreaControlLobby is System {
     using EntityRecordUtils for bytes14;
     using InventoryUtils for bytes14;
     using SmartDeployableUtils for bytes14;
+    using KothUtils for bytes14;
 
     IAreaControlPoint public areaControlPoint;
 
@@ -86,8 +94,8 @@ contract AreaControlLobby is System {
         }
 
         // areaControlPoint = IAreaControlPoint(_areaControlPoint);
-
-        _resetGame(_smartObjectId);
+        uint256 resetTime = block.timestamp;
+        _resetGame(_smartObjectId, resetTime);
 
         ACLobbyConfig.set(
             _smartObjectId,
@@ -96,14 +104,14 @@ contract AreaControlLobby is System {
             _expectedItemId,
             _expectedItemQuantity,
             _expectedControlDepositId,
-            0
+            resetTime
         );
     }
 
     function acResetGame(
         uint256 _smartObjectId
     ) public onlySSUOwner(_smartObjectId) {
-        _resetGame(_smartObjectId);
+        _resetGame(_smartObjectId, block.timestamp);
     }
 
     // _team 1=A, 2=B
@@ -117,10 +125,13 @@ contract AreaControlLobby is System {
 
         uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
+        console.log("acLobbyStatusData.startTime", acLobbyStatusData.startTime);
+        console.log("acLobbyConfigData.duration", acLobbyConfigData.duration);
+
         require(
             acLobbyStatusData.startTime + acLobbyConfigData.duration >=
                 block.timestamp,
-            "AreaControlPoint.claimPoint: game is ongoing"
+            "AreaControlPoint.claimPoint: game is ongoing..."
         );
 
         require(_team <= 2, "AreaControlLobby.acJoinGame: invalid team");
@@ -159,6 +170,9 @@ contract AreaControlLobby is System {
 
         // get item deposit
         uint256 expectedItemId = acLobbyConfigData.expectedItemId;
+
+        console.log("expectedItemId", expectedItemId);
+
         EntityRecordTableData memory itemInEntity = EntityRecordTable.get(
             _namespace().entityRecordTableId(),
             expectedItemId
@@ -167,8 +181,8 @@ contract AreaControlLobby is System {
         inItems[0] = InventoryItem(
             expectedItemId,
             _msgSender(),
-            itemInEntity.typeId,
             itemInEntity.itemId,
+            itemInEntity.typeId,
             itemInEntity.volume,
             acLobbyConfigData.expectedItemQuantity
         );
@@ -227,12 +241,26 @@ contract AreaControlLobby is System {
             "AreaControlPoint.claimPoint: already claimed"
         );
 
+        IWorld world = IWorld(_world());
+
         // @todo change this
         // (uint256 teamATime, uint256 teamBTime) = areaControlPoint
         //     .getTimeControlled(acLobbyConfigData.lastResetTime);
 
-        (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
-            .kothTestV1__getTimeControlled(acLobbyConfigData.lastResetTime);
+        // (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
+        //     .kothTestV5__getTimeControlled(acLobbyConfigData.lastResetTime);
+
+        (uint256 teamATime, uint256 teamBTime) = abi.decode(
+            world.call(
+                KOTH_NAMESPACE.pointSystemId(),
+                abi.encodeCall(
+                    AreaControlPoint.getTimeControlled,
+                    (acLobbyConfigData.lastResetTime)
+                )
+            ),
+            (uint256, uint256)
+        );
+
         if (teamATime > teamBTime) {
             require(
                 teamStatus == 1,
@@ -319,9 +347,9 @@ contract AreaControlLobby is System {
         return team[_getLobbyConfig(_smartObjectId).lastResetTime][_player];
     }
 
-    function _resetGame(uint256 _smartObjectId) internal {
+    function _resetGame(uint256 _smartObjectId, uint256 _resetTime) internal {
         // setting resetTime as game id proxy
-        uint256 resetTime = block.timestamp;
+        uint256 resetTime = _resetTime;
         ACLobbyConfig.setLastResetTime(_smartObjectId, resetTime);
 
         ACLobbyStatus.setClaimed(_smartObjectId, resetTime, false);
