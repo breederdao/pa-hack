@@ -8,9 +8,9 @@ import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.s
 
 import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
 
-contract StartACGame is Script {
+contract StartGame is Script {
     function run(address worldAddress) external {
-        uint256 playerPk = vm.envUint("PlAYER_KEY");
+        uint256 playerPk = vm.envUint("PLAYER_KEY");
         address player = vm.addr(playerPk);
         vm.startBroadcast(playerPk);
 
@@ -22,7 +22,7 @@ contract StartACGame is Script {
         console.log("smartStorageUnitId", _smartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        IAreaControlLobby(worldAddress).kothTestV5__acStartGame(
+        IAreaControlLobby(worldAddress).kothTestV10__acStartGame(
             _smartObjectId // SSU ID
         );
 

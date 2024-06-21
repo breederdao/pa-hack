@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'kothTestV5',
+  namespace: 'kothTestV10',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',
@@ -65,6 +65,7 @@ export default mudConfig({
         teamATotalTime: 'uint256',
         teamBTotalTime: 'uint256',
         claimed: 'bool',
+        isActive: 'bool',
         teamAPlayerList: 'address[]',
         teamBPlayerList: 'address[]',
       },

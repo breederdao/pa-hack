@@ -192,7 +192,7 @@ contract AreaControlLobby is System {
             "AreaControlLobby.acStartGame: not enough players"
         );
         require(
-            acLobbyStatusData.startTime == 0,
+            acLobbyStatusData.startTime > block.timestamp,
             "AreaControlLobby.acStartGame: game already started"
         );
 
@@ -201,6 +201,7 @@ contract AreaControlLobby is System {
             lastResetTime,
             block.timestamp
         );
+        ACLobbyStatus.setIsActive(_smartObjectId, lastResetTime, true);
     }
 
     function acClaimPrize(uint256 _smartObjectId) public {
@@ -214,7 +215,7 @@ contract AreaControlLobby is System {
         uint256 teamStatus = isPlayer(_smartObjectId, _msgSender());
 
         require(
-            acLobbyStatusData.startTime + acLobbyConfigData.duration >=
+            acLobbyStatusData.startTime + acLobbyConfigData.duration <
                 block.timestamp,
             "AreaControlPoint.claimPoint: game is ongoing"
         );
@@ -359,6 +360,7 @@ contract AreaControlLobby is System {
         ACLobbyConfig.setLastResetTime(_smartObjectId, resetTime);
 
         ACLobbyStatus.setClaimed(_smartObjectId, resetTime, false);
+        ACLobbyStatus.setIsActive(_smartObjectId, resetTime, false);
         ACLobbyStatus.setStartTime(
             _smartObjectId,
             resetTime,

@@ -10,7 +10,7 @@ import { IAreaControlPoint } from "../src/codegen/world/IAreaControlPoint.sol";
 
 contract ClaimPoint is Script {
     function run(address worldAddress) external {
-        uint256 playerPk = vm.envUint("PlAYER_KEY");
+        uint256 playerPk = vm.envUint("PLAYER_KEY");
         address player = vm.addr(playerPk);
         vm.startBroadcast(playerPk);
 
@@ -18,16 +18,16 @@ contract ClaimPoint is Script {
         console.log("Player:", player);
 
         // get ssu_ids on env file
-        // uint256 _apSmartObjectId = vm.envUint("AP_SSU_ID");
-        // uint256 _lobbySmartObjectId = vm.envUint("SSU_ID");
-        // console.log("smartStorageUnitId", _apSmartObjectId);
-        // console.log("smartStorageUnitId", _lobbySmartObjectId);
+        uint256 _apSmartObjectId = vm.envUint("AP_SSU_ID");
+        uint256 _lobbySmartObjectId = vm.envUint("SSU_ID");
+        console.log("smartStorageUnitId", _apSmartObjectId);
+        console.log("smartStorageUnitId", _lobbySmartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        // IAreaControlPoint(worldAddress).kothTestV5__claimPoint(
-        //     _apSmartObjectId,
-        //     _lobbySmartObjectId
-        // );
+        IAreaControlPoint(worldAddress).kothTestV10__claimPoint(
+            _apSmartObjectId,
+            _lobbySmartObjectId
+        );
 
         vm.stopBroadcast();
     }

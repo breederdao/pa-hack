@@ -39,6 +39,8 @@ import { Utils as KothUtils } from "./Utils.sol";
 import { IAreaControlLobby } from "../../codegen/world/IAreaControlLobby.sol";
 import { AreaControlLobby } from "./AreaControlLobby.sol";
 
+import { console } from "forge-std/console.sol";
+
 contract AreaControlPoint is System {
     using KothUtils for bytes14;
 
@@ -66,13 +68,13 @@ contract AreaControlPoint is System {
         uint256 duration = acLobbyConfigData.duration;
         uint256 startTime = acLobbyStatusData.startTime;
         uint256 resetTime = acLobbyConfigData.lastResetTime;
+        bool isGameActive = acLobbyStatusData.isActive;
 
         ACControlPointStatusData memory acControlPointStatus = ACControlPointStatus.get(
             _smartObjectId, 
             resetTime
         );
 
-        // get isPlayer using namespace from world
         uint256 isPlayer = abi.decode(
             world.call(
                 KOTH_NAMESPACE.lobbySystemId(),
@@ -84,7 +86,11 @@ contract AreaControlPoint is System {
             (uint256)
         );
 
+        console.log("isPlayer", isPlayer);
+
         require(isPlayer > 0, "AreaControlPoint.claimPoint: not a player");
+
+        require(isGameActive, "AreaControlPoint.claimPoint: game not active");
 
         require(
             startTime + duration >= block.timestamp,
@@ -114,6 +120,54 @@ contract AreaControlPoint is System {
     }
 
     // returns totalTimeControlled, need to provide lobby and ssu point id
+    // returns totalTimeControlled, only accurate if game was ended
+    // function getTimeControlled(
+    //     uint256 _lobbySmartObjectId,
+    //     uint256 _ssuPoint,
+    //     uint256 _resetTime
+    // )
+    //     public
+    //     view
+    //     returns (uint256 teamATime, uint256 teamBTime, uint256 winner)
+    // {
+    //     teamATime = timeControl[_resetTime][1];
+    //     teamBTime = timeControl[_resetTime][2];
+
+    //     ACLobbyStatusData memory lobbyStatusData = _getCurrentLobbyStatus(
+    //         _lobbySmartObjectId
+    //     );
+
+    //     ACLobbyConfigData memory lobbyConfig = _getLobbyConfig(
+    //         _lobbySmartObjectId
+    //     );
+
+    //     uint256 duration = lobbyConfig.duration;
+    //     uint256 startTime = lobbyStatusData.startTime;
+    //     uint256 endTime = startTime + duration;
+
+    //     // Check the current controlling team and add its ongoing control time if the game is still active
+    //     uint256 currentControllingTeam = controllingTeam[_ssuPoint][_resetTime];
+    //     if (currentControllingTeam > 0 && block.timestamp < endTime) {
+    //         uint256 ongoingControlTime = block.timestamp -
+    //             lastControlChange[_ssuPoint][_resetTime];
+    //         if (currentControllingTeam == 1) {
+    //             teamATime += ongoingControlTime;
+    //         } else if (currentControllingTeam == 2) {
+    //             teamBTime += ongoingControlTime;
+    //         }
+    //     }
+
+    //     winner = 0;
+    //     if (teamATime > teamBTime) {
+    //         winner = 1; // Team A wins
+    //     } else if (teamBTime > teamATime) {
+    //         winner = 2; // Team B wins
+    //     }
+
+    //     // return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
+    // }
+
+    // returns totalTimeControlled, only accurate if game was ended
     function getTimeControlled(
         uint256 _lobbySmartObjectId,
         uint256 _smartObjectId
