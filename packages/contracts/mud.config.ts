@@ -52,6 +52,7 @@ export default mudConfig({
         expectedItemQuantity: 'uint256',
         expectedControlDepositId: 'uint256',
         lastResetTime: 'uint256',
+        controlPointIds: 'uint256[]'
       },
     },
     ACLobbyStatus: {
@@ -63,10 +64,22 @@ export default mudConfig({
         startTime: 'uint256',
         teamATotalTime: 'uint256',
         teamBTotalTime: 'uint256',
-        teamAPlayers: 'uint256',
-        teamBPlayers: 'uint256',
         claimed: 'bool',
         isActive: 'bool',
+        teamAPlayerList: 'address[]',
+        teamBPlayerList: 'address[]',
+      },
+    },
+    ACControlPointStatus: {
+      keySchema: {
+        smartObjectId: 'uint256',
+        lastResetTime: 'uint256',
+      },
+      valueSchema: {
+        controllingTeam: 'uint256',
+        lastControlChange: 'uint256',
+        teamATime: 'uint256',
+        teamBTime: 'uint256',
       },
     },
   },

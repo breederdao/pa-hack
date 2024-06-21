@@ -27,7 +27,7 @@ contract SetupGameLobby is Script {
         uint256 _expectedItemId = vm.envUint("ITEM_ID");
         uint256 _expectedItemQuantity = 1;
         uint256 _expectedControlDepositId = 0;
-        address _areaControlPoint = address(0); // @todo change this to AreaControlLobby address
+        uint256[] memory _areaControlPoint; // @todo change this to ssu id of control points
 
         // uint256 _smartObjectId,
         //         uint256 _duration,

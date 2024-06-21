@@ -29,6 +29,7 @@ import { ResourceId, WorldResourceIdLib, WorldResourceIdInstance } from "@lattic
 
 import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
 import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
+import { ACControlPointStatus, ACControlPointStatusData } from "../../codegen/tables/ACControlPointStatus.sol";
 
 import { IWorld } from "../../codegen/world/IWorld.sol";
 
@@ -40,29 +41,11 @@ import { AreaControlLobby } from "./AreaControlLobby.sol";
 
 import { console } from "forge-std/console.sol";
 
-// interface IAreaControlLobby {
-//     function getGameSettings(
-//         uint256 _smartObjectId
-//     )
-//         external
-//         view
-//         returns (uint256 duration, uint256 startTime, uint256 resetTime);
-
-//     function isPlayer(
-//         uint256 _smartObjectId,
-//         address _player
-//     ) external view returns (uint256);
-// }
-
 contract AreaControlPoint is System {
     using KothUtils for bytes14;
-    // IAreaControlLobby public ACLobby;
 
     // resetTime => team 1/2 => time
     mapping(uint256 => mapping(uint256 => uint256)) private timeControl;
-
-    mapping(uint256 => mapping(uint256 => uint256)) controllingTeam; // ssu => resetTime => team 1/2
-    mapping(uint256 => mapping(uint256 => uint256)) lastControlChange; // ssu => resetTime => time of control change
 
     // todo: access control separate from ssuOwner
     // function setACLobby(address _acLobby) public {
@@ -74,8 +57,6 @@ contract AreaControlPoint is System {
         uint256 _lobbySmartObjectId
     ) public {
         IWorld world = IWorld(_world());
-        // (uint256 duration, uint256 startTime, uint256 resetTime) = ACLobby
-        //     .getGameSettings(_lobbySmartObjectId);
 
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _lobbySmartObjectId
@@ -89,11 +70,11 @@ contract AreaControlPoint is System {
         uint256 resetTime = acLobbyConfigData.lastResetTime;
         bool isGameActive = acLobbyStatusData.isActive;
 
-        // uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
-        // uint256 isPlayer = IAreaControlLobby(_world()).kothTestV10__isPlayer(
-        //     _lobbySmartObjectId,
-        //     _msgSender()
-        // );
+        ACControlPointStatusData memory acControlPointStatus = ACControlPointStatus.get(
+            _smartObjectId, 
+            resetTime
+        );
+
         uint256 isPlayer = abi.decode(
             world.call(
                 KOTH_NAMESPACE.lobbySystemId(),
@@ -116,28 +97,29 @@ contract AreaControlPoint is System {
             "AreaControlPoint.claimPoint: no ongoing game"
         );
 
-        if (controllingTeam[_smartObjectId][resetTime] > 0) {
-            require(
-                controllingTeam[_smartObjectId][resetTime] != isPlayer,
-                "AreaControlPoint.claimPoint: point already controlled"
-            );
+        require(
+            isPlayer != ACControlPointStatus.getControllingTeam(_smartObjectId, resetTime),
+            "AreaControlPoint.claimPoint: point already controlled"
+        );
+        
+        if (acControlPointStatus.controllingTeam > 0) {  
+            // get time difference
+            uint256 timeDifference = block.timestamp - acControlPointStatus.lastControlChange;
 
-            // add to totalTime
-            timeControl[resetTime][isPlayer] +=
-                block.timestamp -
-                lastControlChange[_smartObjectId][resetTime];
-
-            console.log(
-                "timeControl[resetTime][isPlayer]",
-                timeControl[resetTime][isPlayer]
-            );
+            // add to totalTime, 
+            if(acControlPointStatus.controllingTeam == 1) {
+                ACControlPointStatus.setTeamATime(_smartObjectId, resetTime, acControlPointStatus.teamATime + timeDifference);
+            } else if(acControlPointStatus.controllingTeam == 2) {
+                ACControlPointStatus.setTeamBTime(_smartObjectId, resetTime, acControlPointStatus.teamBTime + timeDifference);
+            }
         }
 
         // change control and log time
-        controllingTeam[_smartObjectId][resetTime] = isPlayer;
-        lastControlChange[_smartObjectId][resetTime] = block.timestamp;
+        ACControlPointStatus.setControllingTeam(_smartObjectId, resetTime, isPlayer);
+        ACControlPointStatus.setLastControlChange(_smartObjectId, resetTime, block.timestamp);
     }
 
+    // returns totalTimeControlled, need to provide lobby and ssu point id
     // returns totalTimeControlled, only accurate if game was ended
     // function getTimeControlled(
     //     uint256 _lobbySmartObjectId,
@@ -187,9 +169,41 @@ contract AreaControlPoint is System {
 
     // returns totalTimeControlled, only accurate if game was ended
     function getTimeControlled(
-        uint256 _resetTime
+        uint256 _lobbySmartObjectId,
+        uint256 _smartObjectId
     ) public view returns (uint256 teamATime, uint256 teamBTime) {
-        return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _lobbySmartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _lobbySmartObjectId
+        );
+
+        uint256 duration = acLobbyConfigData.duration;
+        uint256 startTime = acLobbyStatusData.startTime;
+        uint256 resetTime = acLobbyConfigData.lastResetTime;
+
+        // check if using roundEnd or current time, if timestamp is greater use roundEnd
+        uint256 roundEnd = startTime + duration;
+        uint256 referenceTime = block.timestamp;
+        if(block.timestamp > roundEnd) {
+            referenceTime = roundEnd;
+        }
+
+        ACControlPointStatusData memory acControlPointStatus = ACControlPointStatus.get(
+            _smartObjectId, 
+            resetTime
+        );
+
+        teamATime = acControlPointStatus.teamATime;
+        teamBTime = acControlPointStatus.teamBTime;
+
+        // if you're controlling team need to compute your current time as its not reflecting in your time, but need to be bound by the round end
+        if(acControlPointStatus.controllingTeam == 1) {
+            teamATime += (referenceTime - acControlPointStatus.lastControlChange);
+        } else if(acControlPointStatus.controllingTeam == 2) {
+            teamBTime += (referenceTime - acControlPointStatus.lastControlChange);
+        }
     }
 
     // returns controlling team 1=A 2=B
@@ -200,11 +214,9 @@ contract AreaControlPoint is System {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _lobbySmartObjectId
         );
-        uint256 resetTime = acLobbyConfigData.lastResetTime;
-        // (, , uint256 resetTime) = IAreaControlLobby(_world())
-        //     .hack007__getGameSettings(_lobbySmartObjectId);
+        uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
-        return controllingTeam[_smartObjectId][resetTime];
+        return ACControlPointStatus.getControllingTeam(_smartObjectId, lastResetTime);
     }
 
     function _getLobbyConfig(
