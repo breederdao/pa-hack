@@ -39,29 +39,11 @@ import { Utils as KothUtils } from "./Utils.sol";
 import { IAreaControlLobby } from "../../codegen/world/IAreaControlLobby.sol";
 import { AreaControlLobby } from "./AreaControlLobby.sol";
 
-// interface IAreaControlLobby {
-//     function getGameSettings(
-//         uint256 _smartObjectId
-//     )
-//         external
-//         view
-//         returns (uint256 duration, uint256 startTime, uint256 resetTime);
-
-//     function isPlayer(
-//         uint256 _smartObjectId,
-//         address _player
-//     ) external view returns (uint256);
-// }
-
 contract AreaControlPoint is System {
     using KothUtils for bytes14;
-    // IAreaControlLobby public ACLobby;
 
     // resetTime => team 1/2 => time
     mapping(uint256 => mapping(uint256 => uint256)) private timeControl;
-
-    mapping(uint256 => mapping(uint256 => uint256)) controllingTeam; // ssu => resetTime => team 1/2
-    mapping(uint256 => mapping(uint256 => uint256)) lastControlChange; // ssu => resetTime => time of control change
 
     // todo: access control separate from ssuOwner
     // function setACLobby(address _acLobby) public {
@@ -120,7 +102,7 @@ contract AreaControlPoint is System {
 
             // add to totalTime, 
             if(acControlPointStatus.controllingTeam == 1) {
-                ACControlPointStatus.setTeamBTime(_smartObjectId, resetTime, acControlPointStatus.teamATime + timeDifference);
+                ACControlPointStatus.setTeamATime(_smartObjectId, resetTime, acControlPointStatus.teamATime + timeDifference);
             } else if(acControlPointStatus.controllingTeam == 2) {
                 ACControlPointStatus.setTeamBTime(_smartObjectId, resetTime, acControlPointStatus.teamBTime + timeDifference);
             }
@@ -131,11 +113,43 @@ contract AreaControlPoint is System {
         ACControlPointStatus.setLastControlChange(_smartObjectId, resetTime, block.timestamp);
     }
 
-    // returns totalTimeControlled, only accurate if game was ended
+    // returns totalTimeControlled, need to provide lobby and ssu point id
     function getTimeControlled(
-        uint256 _resetTime
+        uint256 _lobbySmartObjectId,
+        uint256 _smartObjectId
     ) public view returns (uint256 teamATime, uint256 teamBTime) {
-        return (timeControl[_resetTime][1], timeControl[_resetTime][2]);
+        ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
+            _lobbySmartObjectId
+        );
+        ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
+            _lobbySmartObjectId
+        );
+
+        uint256 duration = acLobbyConfigData.duration;
+        uint256 startTime = acLobbyStatusData.startTime;
+        uint256 resetTime = acLobbyConfigData.lastResetTime;
+
+        // check if using roundEnd or current time, if timestamp is greater use roundEnd
+        uint256 roundEnd = startTime + duration;
+        uint256 referenceTime = block.timestamp;
+        if(block.timestamp > roundEnd) {
+            referenceTime = roundEnd;
+        }
+
+        ACControlPointStatusData memory acControlPointStatus = ACControlPointStatus.get(
+            _smartObjectId, 
+            resetTime
+        );
+
+        teamATime = acControlPointStatus.teamATime;
+        teamBTime = acControlPointStatus.teamBTime;
+
+        // if you're controlling team need to compute your current time as its not reflecting in your time, but need to be bound by the round end
+        if(acControlPointStatus.controllingTeam == 1) {
+            teamATime += (referenceTime - acControlPointStatus.lastControlChange);
+        } else if(acControlPointStatus.controllingTeam == 2) {
+            teamBTime += (referenceTime - acControlPointStatus.lastControlChange);
+        }
     }
 
     // returns controlling team 1=A 2=B

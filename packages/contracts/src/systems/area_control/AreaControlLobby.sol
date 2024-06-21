@@ -69,7 +69,7 @@ contract AreaControlLobby is System {
         uint256 _expectedItemId,
         uint256 _expectedItemQuantity,
         uint256 _expectedControlDepositId,
-        address _areaControlPoint
+        uint256[] memory _controlPointIds
     ) public onlySSUOwner(_smartObjectId) {
         // make sure item exists
         EntityRecordTableData memory entityInRecord = EntityRecordTable.get(
@@ -85,7 +85,6 @@ contract AreaControlLobby is System {
             );
         }
 
-        // areaControlPoint = IAreaControlPoint(_areaControlPoint);
         uint256 resetTime = block.timestamp;
         _resetGame(_smartObjectId, resetTime);
 
@@ -96,7 +95,8 @@ contract AreaControlLobby is System {
             _expectedItemId,
             _expectedItemQuantity,
             _expectedControlDepositId,
-            resetTime
+            resetTime,
+            _controlPointIds
         );
     }
 
@@ -226,25 +226,49 @@ contract AreaControlLobby is System {
 
         IWorld world = IWorld(_world());
 
-        // @todo change this
-        // (uint256 teamATime, uint256 teamBTime) = areaControlPoint
-        //     .getTimeControlled(acLobbyConfigData.lastResetTime);
-
-        // (uint256 teamATime, uint256 teamBTime) = IAreaControlPoint(_world())
-        //     .kothTestV5__getTimeControlled(acLobbyConfigData.lastResetTime);
-
-        (uint256 teamATime, uint256 teamBTime) = abi.decode(
-            world.call(
-                KOTH_NAMESPACE.pointSystemId(),
-                abi.encodeCall(
-                    AreaControlPoint.getTimeControlled,
-                    (acLobbyConfigData.lastResetTime)
-                )
-            ),
-            (uint256, uint256)
+        // computing for total time
+        ACLobbyStatus.setTeamATotalTime(
+            _smartObjectId, 
+            acLobbyConfigData.lastResetTime, 
+            0
         );
 
-        if (teamATime > teamBTime) {
+        ACLobbyStatus.setTeamBTotalTime(
+            _smartObjectId, 
+            acLobbyConfigData.lastResetTime, 
+            0
+        );
+
+        for(uint256 i = 0; i < acLobbyConfigData.controlPointIds.length; i++) {
+            (uint256 teamATime, uint256 teamBTime) = abi.decode(
+                world.call(
+                    KOTH_NAMESPACE.pointSystemId(),
+                    abi.encodeCall(
+                        AreaControlPoint.getTimeControlled,
+                        (_smartObjectId, acLobbyConfigData.controlPointIds[i])
+                    )
+                ),
+                (uint256, uint256)
+            );
+
+            // adding team A time
+            ACLobbyStatus.setTeamATotalTime(
+                _smartObjectId, 
+                acLobbyConfigData.lastResetTime, 
+                acLobbyStatusData.teamATotalTime + teamATime
+            );
+
+            // adding team B time
+            ACLobbyStatus.setTeamBTotalTime(
+                _smartObjectId, 
+                acLobbyConfigData.lastResetTime, 
+                acLobbyStatusData.teamBTotalTime + teamBTime
+            );
+        }
+
+        
+
+        if (acLobbyStatusData.teamATotalTime > acLobbyStatusData.teamBTotalTime) {
             require(
                 teamStatus == 1,
                 "AreaControlPoint.claimPoint: not winning team"
