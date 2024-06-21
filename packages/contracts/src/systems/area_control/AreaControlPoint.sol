@@ -29,6 +29,7 @@ import { ResourceId, WorldResourceIdLib, WorldResourceIdInstance } from "@lattic
 
 import { ACLobbyConfig, ACLobbyConfigData } from "../../codegen/tables/ACLobbyConfig.sol";
 import { ACLobbyStatus, ACLobbyStatusData } from "../../codegen/tables/ACLobbyStatus.sol";
+import { ACControlPointStatus, ACControlPointStatusData } from "../../codegen/tables/ACControlPointStatus.sol";
 
 import { IWorld } from "../../codegen/world/IWorld.sol";
 
@@ -72,8 +73,6 @@ contract AreaControlPoint is System {
         uint256 _lobbySmartObjectId
     ) public {
         IWorld world = IWorld(_world());
-        // (uint256 duration, uint256 startTime, uint256 resetTime) = ACLobby
-        //     .getGameSettings(_lobbySmartObjectId);
 
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _lobbySmartObjectId
@@ -86,11 +85,12 @@ contract AreaControlPoint is System {
         uint256 startTime = acLobbyStatusData.startTime;
         uint256 resetTime = acLobbyConfigData.lastResetTime;
 
-        // uint256 isPlayer = ACLobby.isPlayer(_lobbySmartObjectId, _msgSender());
-        // uint256 isPlayer = IAreaControlLobby(_world()).kothTestV5__isPlayer(
-        //     _lobbySmartObjectId,
-        //     _msgSender()
-        // );
+        ACControlPointStatusData memory acControlPointStatus = ACControlPointStatus.get(
+            _smartObjectId, 
+            resetTime
+        );
+
+        // get isPlayer using namespace from world
         uint256 isPlayer = abi.decode(
             world.call(
                 KOTH_NAMESPACE.lobbySystemId(),
@@ -109,21 +109,26 @@ contract AreaControlPoint is System {
             "AreaControlPoint.claimPoint: no ongoing game"
         );
 
-        if (controllingTeam[_smartObjectId][resetTime] > 0) {
-            require(
-                controllingTeam[_smartObjectId][resetTime] != isPlayer,
-                "AreaControlPoint.claimPoint: point already controlled"
-            );
+        require(
+            isPlayer != ACControlPointStatus.getControllingTeam(_smartObjectId, resetTime),
+            "AreaControlPoint.claimPoint: point already controlled"
+        );
+        
+        if (acControlPointStatus.controllingTeam > 0) {  
+            // get time difference
+            uint256 timeDifference = block.timestamp - acControlPointStatus.lastControlChange;
 
-            // add to totalTime
-            timeControl[resetTime][isPlayer] +=
-                block.timestamp -
-                lastControlChange[_smartObjectId][resetTime];
+            // add to totalTime, 
+            if(acControlPointStatus.controllingTeam == 1) {
+                ACControlPointStatus.setTeamBTime(_smartObjectId, resetTime, acControlPointStatus.teamATime + timeDifference);
+            } else if(acControlPointStatus.controllingTeam == 2) {
+                ACControlPointStatus.setTeamBTime(_smartObjectId, resetTime, acControlPointStatus.teamBTime + timeDifference);
+            }
         }
 
         // change control and log time
-        controllingTeam[_smartObjectId][resetTime] = isPlayer;
-        lastControlChange[_smartObjectId][resetTime] = block.timestamp;
+        ACControlPointStatus.setControllingTeam(_smartObjectId, resetTime, isPlayer);
+        ACControlPointStatus.setLastControlChange(_smartObjectId, resetTime, block.timestamp);
     }
 
     // returns totalTimeControlled, only accurate if game was ended
@@ -141,11 +146,9 @@ contract AreaControlPoint is System {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _lobbySmartObjectId
         );
-        uint256 resetTime = acLobbyConfigData.lastResetTime;
-        // (, , uint256 resetTime) = IAreaControlLobby(_world())
-        //     .hack007__getGameSettings(_lobbySmartObjectId);
+        uint256 lastResetTime = acLobbyConfigData.lastResetTime;
 
-        return controllingTeam[_smartObjectId][resetTime];
+        return ACControlPointStatus.getControllingTeam(_smartObjectId, lastResetTime);
     }
 
     function _getLobbyConfig(
