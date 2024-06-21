@@ -8,7 +8,7 @@ import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.s
 
 import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
 
-contract JoinGameLobby is Script {
+contract AcClaimPrize is Script {
     function run(address worldAddress) external {
         uint256 playerPK = vm.envUint("PLAYER_KEY");
         address player = vm.addr(playerPK);
@@ -21,10 +21,8 @@ contract JoinGameLobby is Script {
         uint256 _smartObjectId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", _smartObjectId);
 
-        uint256 _team = vm.envUint("TEAM"); // Team 1, 2
-        IAreaControlLobby(worldAddress).kothTestV10__acJoinGame(
-            _smartObjectId,
-            _team
+        IAreaControlLobby(worldAddress).kothTestV10__acClaimPrize(
+            _smartObjectId
         );
 
         vm.stopBroadcast();
