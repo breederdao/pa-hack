@@ -135,17 +135,27 @@ contract AreaControlLobby is System {
 
         if (_team == 1) {
             require(
-                acLobbyStatusData.teamAPlayerList.length < acLobbyConfigData.playerCount,
+                acLobbyStatusData.teamAPlayerList.length <
+                    acLobbyConfigData.playerCount,
                 "AreaControlLobby.acJoinGame: team is full"
             );
 
-            ACLobbyStatus.pushTeamAPlayerList(_smartObjectId, lastResetTime, _msgSender());
+            ACLobbyStatus.pushTeamAPlayerList(
+                _smartObjectId,
+                lastResetTime,
+                _msgSender()
+            );
         } else if (_team == 2) {
             require(
-                acLobbyStatusData.teamBPlayerList.length < acLobbyConfigData.playerCount,
+                acLobbyStatusData.teamBPlayerList.length <
+                    acLobbyConfigData.playerCount,
                 "AreaControlLobby.acJoinGame: team is full"
             );
-            ACLobbyStatus.pushTeamBPlayerList(_smartObjectId, lastResetTime, _msgSender());
+            ACLobbyStatus.pushTeamBPlayerList(
+                _smartObjectId,
+                lastResetTime,
+                _msgSender()
+            );
         }
 
         // setting team
@@ -187,8 +197,10 @@ contract AreaControlLobby is System {
             "AreaControlLobby.acStartGame: not part of game"
         );
         require(
-            acLobbyStatusData.teamAPlayerList.length == acLobbyConfigData.playerCount &&
-                acLobbyStatusData.teamBPlayerList.length == acLobbyConfigData.playerCount,
+            acLobbyStatusData.teamAPlayerList.length ==
+                acLobbyConfigData.playerCount &&
+                acLobbyStatusData.teamBPlayerList.length ==
+                acLobbyConfigData.playerCount,
             "AreaControlLobby.acStartGame: not enough players"
         );
         require(
@@ -229,18 +241,18 @@ contract AreaControlLobby is System {
 
         // computing for total time
         ACLobbyStatus.setTeamATotalTime(
-            _smartObjectId, 
-            acLobbyConfigData.lastResetTime, 
+            _smartObjectId,
+            acLobbyConfigData.lastResetTime,
             0
         );
 
         ACLobbyStatus.setTeamBTotalTime(
-            _smartObjectId, 
-            acLobbyConfigData.lastResetTime, 
+            _smartObjectId,
+            acLobbyConfigData.lastResetTime,
             0
         );
 
-        for(uint256 i = 0; i < acLobbyConfigData.controlPointIds.length; i++) {
+        for (uint256 i = 0; i < acLobbyConfigData.controlPointIds.length; i++) {
             (uint256 teamATime, uint256 teamBTime) = abi.decode(
                 world.call(
                     KOTH_NAMESPACE.pointSystemId(),
@@ -254,22 +266,22 @@ contract AreaControlLobby is System {
 
             // adding team A time
             ACLobbyStatus.setTeamATotalTime(
-                _smartObjectId, 
-                acLobbyConfigData.lastResetTime, 
+                _smartObjectId,
+                acLobbyConfigData.lastResetTime,
                 acLobbyStatusData.teamATotalTime + teamATime
             );
 
             // adding team B time
             ACLobbyStatus.setTeamBTotalTime(
-                _smartObjectId, 
-                acLobbyConfigData.lastResetTime, 
+                _smartObjectId,
+                acLobbyConfigData.lastResetTime,
                 acLobbyStatusData.teamBTotalTime + teamBTime
             );
         }
 
-        
-
-        if (acLobbyStatusData.teamATotalTime > acLobbyStatusData.teamBTotalTime) {
+        if (
+            acLobbyStatusData.teamATotalTime > acLobbyStatusData.teamBTotalTime
+        ) {
             require(
                 teamStatus == 1,
                 "AreaControlPoint.claimPoint: not winning team"
@@ -314,7 +326,12 @@ contract AreaControlLobby is System {
     )
         public
         view
-        returns (uint256 duration, uint256 startTime, uint256 resetTime)
+        returns (
+            uint256 duration,
+            uint256 startTime,
+            bool isActive,
+            uint256 resetTime
+        )
     {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
             _smartObjectId
@@ -325,6 +342,7 @@ contract AreaControlLobby is System {
         return (
             acLobbyConfigData.duration,
             acLobbyStatusData.startTime,
+            acLobbyStatusData.isActive,
             acLobbyConfigData.lastResetTime
         );
     }
@@ -340,9 +358,10 @@ contract AreaControlLobby is System {
         ACLobbyStatusData memory acLobbyStatusData = _getCurrentLobbyStatus(
             _smartObjectId
         );
-        
+
         return (
-            acLobbyStatusData.teamAPlayerList, acLobbyStatusData.teamBPlayerList
+            acLobbyStatusData.teamAPlayerList,
+            acLobbyStatusData.teamBPlayerList
         );
     }
 
