@@ -3,23 +3,25 @@ pragma solidity >=0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
-import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
+import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
 import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
 
 contract ReleasePrize is Script {
     function run(address worldAddress) external {
-        uint256 ssuOwnerPK = vm.envUint("PRIVATE_KEY");
-        address ssuOwner = vm.addr(ssuOwnerPK);
-        vm.startBroadcast(ssuOwnerPK);
+        uint256 playerPk = vm.envUint("PLAYER_KEY");
+        address player = vm.addr(playerPk);
+        vm.startBroadcast(playerPk);
 
         console.log("world address:", worldAddress);
-        console.log("ssuOwner:", ssuOwner);
+        console.log("player:", player);
 
         // get ssu_id on env file
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", smartStorageUnitId);
 
-        // IKingOfTheHill(worldAddress).king__claimPrize(smartStorageUnitId);
+        IAreaControlLobby(worldAddress).kothTestV10__acClaimPrize(
+            smartStorageUnitId
+        );
 
         vm.stopBroadcast();
     }

@@ -330,6 +330,7 @@ contract AreaControlLobby is System {
             uint256 duration,
             uint256 startTime,
             bool isActive,
+            bool claimed,
             uint256 resetTime
         )
     {
@@ -343,6 +344,7 @@ contract AreaControlLobby is System {
             acLobbyConfigData.duration,
             acLobbyStatusData.startTime,
             acLobbyStatusData.isActive,
+            acLobbyStatusData.claimed,
             acLobbyConfigData.lastResetTime
         );
     }

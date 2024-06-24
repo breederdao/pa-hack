@@ -22,12 +22,16 @@ contract SetupGameLobby is Script {
         console.log("smartStorageUnitId", _smartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        uint256 _duration = 60 * 15; // 15 minutes
-        uint256 _playerCount = 2;
+        uint256 _duration = 60 * 60; // 15 minutes
+        uint256 _playerCount = 1;
         uint256 _expectedItemId = vm.envUint("ITEM_ID");
         uint256 _expectedItemQuantity = 1;
         uint256 _expectedControlDepositId = 0;
-        uint256[] memory _areaControlPoint; // @todo change this to ssu id of control points
+        uint256[] memory _areaControlPointIds; // @todo change this to ssu id of control points
+        // uint256[] memory _areaControlPointIds = new uint256[](3);
+        // _areaControlPointIds[0] = vm.envUint("AC_POINT_ONE_SSU_ID");
+        // _areaControlPointIds[1] = vm.envUint("AC_POINT_TWO_SSU_ID");
+        // _areaControlPointIds[2] = vm.envUint("AC_POINT_THREE_SSU_ID");
 
         // uint256 _smartObjectId,
         //         uint256 _duration,
@@ -36,15 +40,15 @@ contract SetupGameLobby is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        // IAreaControlLobby(worldAddress).kothTestV10__setLobbyConfig(
-        //     _smartObjectId, // SSU ID
-        //     _duration, // duration in seconds
-        //     _playerCount,
-        //     _expectedItemId,
-        //     _expectedItemQuantity,
-        //     _expectedControlDepositId, // set to zero
-        //     _areaControlPoint // address of area point
-        // );
+        IAreaControlLobby(worldAddress).kothTestV10__setLobbyConfig(
+            _smartObjectId, // SSU ID
+            _duration, // duration in seconds
+            _playerCount,
+            _expectedItemId,
+            _expectedItemQuantity,
+            _expectedControlDepositId, // set to zero
+            _areaControlPointIds // address of area point
+        );
 
         vm.stopBroadcast();
     }
