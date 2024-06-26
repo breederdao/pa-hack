@@ -9,7 +9,7 @@ import { Base_Script } from "./Base.s.sol";
 import { AreaControlPoint } from "../src/systems/area_control/AreaControlPoint.sol";
 
 contract GetTimeControlled is Base_Script {
-    function _run(IWorld world) internal override broadcastPlayer {
+    function _run(IWorld world) public override broadcastPlayer {
         // Load Area Point SSU ID from env file
         uint256 _smartObjectId = vm.envUint("AP_SSU_ID");
 
