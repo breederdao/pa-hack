@@ -277,6 +277,8 @@ contract AreaControlLobby is System {
                 acLobbyConfigData.lastResetTime,
                 acLobbyStatusData.teamBTotalTime + teamBTime
             );
+
+            acLobbyStatusData = _getCurrentLobbyStatus(_smartObjectId);
         }
 
         if (
@@ -284,12 +286,12 @@ contract AreaControlLobby is System {
         ) {
             require(
                 teamStatus == 1,
-                "AreaControlPoint.claimPoint: not winning team"
+                "AreaControlPoint.claimPoint: not winning team B"
             );
         } else {
             require(
                 teamStatus == 2,
-                "AreaControlPoint.claimPoint: not winning team"
+                "AreaControlPoint.claimPoint: not winning team A"
             );
         }
 
