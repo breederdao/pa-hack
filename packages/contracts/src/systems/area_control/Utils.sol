@@ -6,7 +6,7 @@ import { WorldResourceIdLib } from "@latticexyz/world/src/WorldResourceId.sol";
 import { RESOURCE_SYSTEM } from "@latticexyz/world/src/worldResourceTypes.sol";
 import { ResourceIds } from "@latticexyz/store/src/codegen/tables/ResourceIds.sol";
 
-import { KOTH_NAMESPACE, AC_LOBBY_SYSTEM_NAME, AC_POINT_SYSTEM_NAME } from "../constants.sol";
+import { KOTH_NAMESPACE, AC_LOBBY_SYSTEM_NAME, AC_POINT_SYSTEM_NAME, KING_OF_THE_HILL } from "../constants.sol";
 
 library Utils {
     function lobbySystemId(
@@ -28,6 +28,17 @@ library Utils {
                 typeId: RESOURCE_SYSTEM,
                 namespace: namespace,
                 name: AC_POINT_SYSTEM_NAME
+            });
+    }
+
+    function kothSystemId(
+        bytes14 namespace
+    ) internal pure returns (ResourceId) {
+        return
+            WorldResourceIdLib.encode({
+                typeId: RESOURCE_SYSTEM,
+                namespace: namespace,
+                name: KING_OF_THE_HILL
             });
     }
 }
