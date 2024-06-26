@@ -8,4 +8,4 @@ bytes16 constant AC_POINT_SYSTEM_NAME = "AreaControlPoint";
 
 // ** System Name */
 
-bytes14 constant KOTH_NAMESPACE = "kothTestV10";
+bytes14 constant KOTH_NAMESPACE = "kothTestV16";

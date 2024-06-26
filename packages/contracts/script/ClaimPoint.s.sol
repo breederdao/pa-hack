@@ -24,7 +24,7 @@ contract ClaimPoint is Script {
         console.log("smartStorageUnitId", _lobbySmartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        IAreaControlPoint(worldAddress).kothTestV10__claimPoint(
+        IAreaControlPoint(worldAddress).kothTestV16__claimPoint(
             _apSmartObjectId,
             _lobbySmartObjectId
         );

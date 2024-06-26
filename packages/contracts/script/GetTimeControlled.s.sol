@@ -29,7 +29,7 @@ contract GetTimeControlled is Script {
 
         // get ssu_id on env file
         uint256 _lobbySmartObjectId = vm.envUint("SSU_ID");
-        uint256 _smartObjectId = vm.envUint("ACP_ONE_SSU_ID");
+        uint256 _smartObjectId = vm.envUint("AP_SSU_ID");
         console.log("smartStorageUnitId", _lobbySmartObjectId);
         console.log("pointId", _smartObjectId);
 

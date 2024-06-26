@@ -22,7 +22,7 @@ contract StartGame is Script {
         console.log("smartStorageUnitId", _smartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        IAreaControlLobby(worldAddress).kothTestV10__acStartGame(
+        IAreaControlLobby(worldAddress).kothTestV16__acStartGame(
             _smartObjectId // SSU ID
         );
 
