@@ -16,7 +16,7 @@ contract SetKingOfTheHillConfig is Base_Script {
         uint256 _expectedItemIncrement = 1; // increment by 1 every claim
 
         world.call(
-            kothSysmteId(),
+            kothSystemId(),
             abi.encodeCall(
                 KingOfTheHill.setKingOfTheHillConfig,
                 (

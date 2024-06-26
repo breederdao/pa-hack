@@ -51,7 +51,7 @@ abstract contract Base_Script is Script {
         return KOTH_NAMESPACE.pointSystemId();
     }
 
-    function kothSysmteId() internal pure returns (ResourceId) {
+    function kothSystemId() internal pure returns (ResourceId) {
         return KOTH_NAMESPACE.kothSystemId();
     }
 }
