@@ -10,9 +10,6 @@ import { AreaControlLobby } from "../src/systems/area_control/AreaControlLobby.s
 
 contract StartGame is Base_Script {
     function _run(IWorld world) public override broadcastPlayer {
-        // Load SSU ID from env file
-        uint256 _smartObjectId = vm.envUint("SSU_ID");
-
         world.call(
             lobbySystemId(),
             abi.encodeCall(AreaControlLobby.acStartGame, (ssuIdLobby))
