@@ -23,7 +23,7 @@ contract SetupGameLobby is Script {
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
         uint256 _duration = 60 * 5; // 15 minutes
-        uint256 _playerCount = 2;
+        uint256 _playerCount = 1;
         uint256 _expectedItemId = vm.envUint("ITEM_ID");
         uint256 _expectedItemQuantity = 1;
         uint256 _expectedControlDepositId = 0;

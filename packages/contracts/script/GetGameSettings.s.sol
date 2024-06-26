@@ -36,7 +36,9 @@ contract GetGameSettings is Script {
             uint256 startTime,
             bool isActive,
             bool claimed,
-            uint256 resetTime
+            uint256 resetTime,
+            uint256 expectedItemQuantity,
+            uint256 playerCount
         ) = abi.decode(
                 world.call(
                     KOTH_NAMESPACE.lobbySystemId(),
@@ -45,7 +47,7 @@ contract GetGameSettings is Script {
                         (_smartObjectId)
                     )
                 ),
-                (uint256, uint256, bool, bool, uint256)
+                (uint256, uint256, bool, bool, uint256, uint256, uint256)
             );
 
         console.log("duration", duration);
@@ -53,6 +55,8 @@ contract GetGameSettings is Script {
         console.log("resetTime", resetTime);
         console.log("isActive", isActive);
         console.log("claimed", claimed);
+        console.log("expectedItemQuantity", expectedItemQuantity);
+        console.log("playerCount", playerCount);
 
         vm.stopBroadcast();
     }
