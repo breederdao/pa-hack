@@ -17,6 +17,7 @@ contract SetupGameLobby is Base_Script {
         uint256 _expectedItemId = vm.envUint("ITEM_ID");
         uint256 _expectedItemQuantity = 1;
         uint256 _expectedControlDepositId = 0;
+        uint256 _ssuIdLobby = ssuIdLobby;
 
         // Load Area Control Point ID from env file
         uint256[] memory _areaControlPointIds = new uint256[](1);
