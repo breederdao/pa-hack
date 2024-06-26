@@ -18,13 +18,13 @@ contract ClaimPoint is Script {
         console.log("Player:", player);
 
         // get ssu_ids on env file
-        uint256 _apSmartObjectId = vm.envUint("AP_SSU_ID");
+        uint256 _apSmartObjectId = vm.envUint("ACP_ONE_SSU_ID");
         uint256 _lobbySmartObjectId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", _apSmartObjectId);
         console.log("smartStorageUnitId", _lobbySmartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        IAreaControlPoint(worldAddress).kothTestV10__claimPoint(
+        IAreaControlPoint(worldAddress).kothTestV16__claimPoint(
             _apSmartObjectId,
             _lobbySmartObjectId
         );

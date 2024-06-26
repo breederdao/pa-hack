@@ -21,7 +21,7 @@ contract AcClaimPrize is Script {
         uint256 _smartObjectId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", _smartObjectId);
 
-        IAreaControlLobby(worldAddress).kothTestV10__acClaimPrize(
+        IAreaControlLobby(worldAddress).kothTestV16__acClaimPrize(
             _smartObjectId
         );
 

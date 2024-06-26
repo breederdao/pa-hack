@@ -20,6 +20,7 @@
     "claim-point": "source ./.env && pnpm forge script script/ClaimPoint.s.sol:ClaimPoint --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "controlling-team": "source ./.env && pnpm forge script script/GetControllingTeam.s.sol:GetControllingTeam --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "controlled-time": "source ./.env && pnpm forge script script/GetTimeControlled.s.sol:GetTimeControlled --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
+    "game-settings": "source ./.env && pnpm forge script script/GetGameSettings.s.sol:GetGameSettings --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "ac-claim-prize": "source ./.env && pnpm forge script script/AcClaimPrize.s.sol:AcClaimPrize --broadcast --rpc-url $RPC_URL --chain-id $CHAIN_ID --sig \"run(address)\" $WORLD_ADDRESS -vvv",
     "lint": "pnpm run prettier && pnpm run solhint",
     "prettier": "prettier --write 'src/**/*.sol'",

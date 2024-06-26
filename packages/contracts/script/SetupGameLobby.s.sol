@@ -22,16 +22,16 @@ contract SetupGameLobby is Script {
         console.log("smartStorageUnitId", _smartObjectId);
 
         // uint256 _duration = 60 * 60 * 24 * 7; // 1 week
-        uint256 _duration = 60 * 60; // 15 minutes
-        uint256 _playerCount = 1;
+        uint256 _duration = 60 * 5; // 15 minutes
+        uint256 _playerCount = 2;
         uint256 _expectedItemId = vm.envUint("ITEM_ID");
         uint256 _expectedItemQuantity = 1;
         uint256 _expectedControlDepositId = 0;
-        uint256[] memory _areaControlPointIds; // @todo change this to ssu id of control points
-        // uint256[] memory _areaControlPointIds = new uint256[](3);
-        // _areaControlPointIds[0] = vm.envUint("AC_POINT_ONE_SSU_ID");
-        // _areaControlPointIds[1] = vm.envUint("AC_POINT_TWO_SSU_ID");
-        // _areaControlPointIds[2] = vm.envUint("AC_POINT_THREE_SSU_ID");
+        // uint256[] memory _areaControlPointIds; // @todo change this to ssu id of control points
+        uint256[] memory _areaControlPointIds = new uint256[](3);
+        _areaControlPointIds[0] = vm.envUint("ACP_ONE_SSU_ID");
+        _areaControlPointIds[1] = vm.envUint("ACP_TWO_SSU_ID");
+        _areaControlPointIds[2] = vm.envUint("ACP_THREE_SSU_ID");
 
         // uint256 _smartObjectId,
         //         uint256 _duration,
@@ -40,7 +40,7 @@ contract SetupGameLobby is Script {
         //         uint256 _expectedItemQuantity,
         //         uint256 _expectedControlDepositId,
         //         address _areaControlPoint
-        IAreaControlLobby(worldAddress).kothTestV10__setLobbyConfig(
+        IAreaControlLobby(worldAddress).kothTestV16__setLobbyConfig(
             _smartObjectId, // SSU ID
             _duration, // duration in seconds
             _playerCount,

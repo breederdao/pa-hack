@@ -6,6 +6,8 @@ import { console } from "forge-std/console.sol";
 import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
 import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
 
+import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
+
 contract ResetGame is Script {
     function run(address worldAddress) external {
         uint256 ssuOwnerPK = vm.envUint("PRIVATE_KEY");
@@ -20,6 +22,9 @@ contract ResetGame is Script {
         console.log("smartStorageUnitId", smartStorageUnitId);
 
         // IKingOfTheHill(worldAddress).abcde__resetGame(smartStorageUnitId, 2);
+        IAreaControlLobby(worldAddress).kothTestV16__acResetGame(
+            smartStorageUnitId
+        );
 
         vm.stopBroadcast();
     }

@@ -19,7 +19,7 @@ contract ReleasePrize is Script {
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
         console.log("smartStorageUnitId", smartStorageUnitId);
 
-        IAreaControlLobby(worldAddress).kothTestV10__acClaimPrize(
+        IAreaControlLobby(worldAddress).kothTestV16__acClaimPrize(
             smartStorageUnitId
         );
 

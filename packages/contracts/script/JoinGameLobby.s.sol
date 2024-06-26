@@ -22,7 +22,7 @@ contract JoinGameLobby is Script {
         console.log("smartStorageUnitId", _smartObjectId);
 
         uint256 _team = vm.envUint("TEAM"); // Team 1, 2
-        IAreaControlLobby(worldAddress).kothTestV10__acJoinGame(
+        IAreaControlLobby(worldAddress).kothTestV16__acJoinGame(
             _smartObjectId,
             _team
         );
