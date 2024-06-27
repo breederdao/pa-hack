@@ -1,32 +1,21 @@
 pragma solidity >=0.8.20;
 
-import { Script } from "forge-std/Script.sol";
-import { console } from "forge-std/console.sol";
+import {Script} from "forge-std/Script.sol";
+import {console} from "forge-std/console.sol";
 
-import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
-import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
+import {IWorld} from "../src/codegen/world/IWorld.sol";
 
-import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
+import {Base_Script} from "./Base.s.sol";
+import {AreaControlLobby} from "../src/systems/area_control/AreaControlLobby.sol";
 
-contract JoinGameLobby is Script {
-    function run(address worldAddress) external {
-        uint256 playerPK = vm.envUint("PLAYER_KEY");
-        address player = vm.addr(playerPK);
-        vm.startBroadcast(playerPK);
+contract JoinGameLobby is Base_Script {
+    function _run(IWorld world) public override broadcastPlayer {
+        // Load Team from env file
+        uint256 _team = vm.envUint("TEAM");
 
-        console.log("world address:", worldAddress);
-        console.log("Player Address:", player);
-
-        // Load SSU ID from env file
-        uint256 _smartObjectId = vm.envUint("SSU_ID");
-        console.log("smartStorageUnitId", _smartObjectId);
-
-        uint256 _team = vm.envUint("TEAM"); // Team 1, 2
-        IAreaControlLobby(worldAddress).kothTestV16__acJoinGame(
-            _smartObjectId,
-            _team
+        world.call(
+            lobbySystemId(),
+            abi.encodeCall(AreaControlLobby.acJoinGame, (ssuIdLobby, _team))
         );
-
-        vm.stopBroadcast();
     }
 }

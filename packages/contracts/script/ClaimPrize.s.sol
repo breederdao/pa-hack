@@ -3,24 +3,28 @@ pragma solidity >=0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
-import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
-import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
+import { IWorld } from "../src/codegen/world/IWorld.sol";
 
-contract ClaimPrize is Script {
-    function run(address worldAddress) external {
-        uint256 playerKey = vm.envUint("PLAYER_KEY");
-        address player = vm.addr(playerKey);
-        vm.startBroadcast(playerKey);
+import { Base_Script } from "./Base.s.sol";
+import { KingOfTheHill } from "../src/systems/koth/KingOfTheHill.sol";
 
-        console.log("world address:", worldAddress);
-        console.log("ssuOwner:", player);
-
+contract ClaimPrize is Base_Script {
+    function _run(IWorld world) public override broadcastPlayer {
         // get ssu_id on env file
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
-        console.log("smartStorageUnitId", smartStorageUnitId);
 
-        // IKingOfTheHill(worldAddress).lala__claimPrize(smartStorageUnitId);
+        // world.call(
+        //     kothSystemId(),
+        //     abi.encodeCall(
+        //         KingOfTheHill.claimPrize(uint256),
+        //         (smartStorageUnitId)
+        //     )
+        // );
 
-        vm.stopBroadcast();
+        bytes memory data = abi.encodeWithSelector(
+            bytes4(keccak256("claimPrize(uint256)")),
+            smartStorageUnitId
+        );
+        world.call(kothSystemId(), data);
     }
 }
