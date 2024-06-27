@@ -3,24 +3,23 @@ pragma solidity >=0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
-import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
-import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
+import { IWorld } from "../src/codegen/world/IWorld.sol";
 
-contract ResetGame is Script {
-    function run(address worldAddress) external {
-        uint256 ssuOwnerPK = vm.envUint("PRIVATE_KEY");
-        address ssuOwner = vm.addr(ssuOwnerPK);
-        vm.startBroadcast(ssuOwnerPK);
+import { Base_Script } from "./Base.s.sol";
+import { KingOfTheHill } from "../src/systems/koth/KingOfTheHill.sol";
 
-        console.log("world address:", worldAddress);
-        console.log("ssuOwner:", ssuOwner);
-
+contract ResetGame is Base_Script {
+    function _run(IWorld world) public override broadcast {
         // get ssu_id on env file
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
-        console.log("smartStorageUnitId", smartStorageUnitId);
+        uint256 _initItemQuantity = 2; // initial item quantity
 
-        // IKingOfTheHill(worldAddress).abcde__resetGame(smartStorageUnitId, 2);
-
-        vm.stopBroadcast();
+        world.call(
+            kothSystemId(),
+            abi.encodeCall(
+                KingOfTheHill.resetGame,
+                (smartStorageUnitId, _initItemQuantity)
+            )
+        );
     }
 }

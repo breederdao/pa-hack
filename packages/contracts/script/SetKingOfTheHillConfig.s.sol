@@ -3,38 +3,29 @@ pragma solidity >=0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
-import { IKingOfTheHill } from "../src/codegen/world/IKingOfTheHill.sol";
-import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
+import { IWorld } from "../src/codegen/world/IWorld.sol";
 
-contract SetKingOfTheHillConfig is Script {
-    function run(address worldAddress) external {
-        uint256 ssuOwner = vm.envUint("PRIVATE_KEY");
-        address owner = vm.addr(ssuOwner);
-        vm.startBroadcast(ssuOwner);
+import { Base_Script } from "./Base.s.sol";
+import { KingOfTheHill } from "../src/systems/koth/KingOfTheHill.sol";
 
-        console.log("world address:", worldAddress);
-        console.log("ssuOwner:", ssuOwner);
+contract SetKingOfTheHillConfig is Base_Script {
+    function _run(IWorld world) public override broadcast {
+        uint256 _smartObjectId = vm.envUint("SSU_ID");
+        uint256 _duration = 3 minutes; // reset 3 minutes duration every claim
+        uint256 _expectedItemId = vm.envUint("ITEM_ID");
+        uint256 _expectedItemIncrement = 1; // increment by 1 every claim
 
-        // get ssu_id on env file
-        uint256 smartStorageUnitId = vm.envUint("SSU_ID");
-        uint256 itemId = vm.envUint("ITEM_ID");
-
-        console.log("smartStorageUnitId", smartStorageUnitId);
-        console.log("itemId", itemId);
-
-        // IKingOfTheHill(worldAddress).bdArena__setKingOfTheHillConfig(
-        //     smartStorageUnitId,
-        //     block.timestamp + 1 days,
-        //     itemId,
-        //     5 // increment by 5 every claim
-        // );
-        // IKingOfTheHill(worldAddress).king__setKingOfTheHillConfig(
-        //     smartStorageUnitId,
-        //     3 minutes,
-        //     itemId,
-        //     3
-        // );
-
-        vm.stopBroadcast();
+        world.call(
+            kothSystemId(),
+            abi.encodeCall(
+                KingOfTheHill.setKingOfTheHillConfig,
+                (
+                    _smartObjectId,
+                    _duration,
+                    _expectedItemId,
+                    _expectedItemIncrement
+                )
+            )
+        );
     }
 }

@@ -1,7 +1,7 @@
 import { mudConfig } from '@latticexyz/world/register'
 
 export default mudConfig({
-  namespace: 'kothTestV10',
+  namespace: 'kothTestV16',
   systems: {
     KingOfTheHill: {
       name: 'KingOfTheHill',
@@ -52,7 +52,7 @@ export default mudConfig({
         expectedItemQuantity: 'uint256',
         expectedControlDepositId: 'uint256',
         lastResetTime: 'uint256',
-        controlPointIds: 'uint256[]'
+        controlPointIds: 'uint256[]',
       },
     },
     ACLobbyStatus: {

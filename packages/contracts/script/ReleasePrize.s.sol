@@ -3,26 +3,16 @@ pragma solidity >=0.8.20;
 import { Script } from "forge-std/Script.sol";
 import { console } from "forge-std/console.sol";
 
-import { IAreaControlLobby } from "../src/codegen/world/IAreaControlLobby.sol";
-import { KingOfTheHillConfig, KingOfTheHillStatus } from "../src/codegen/index.sol";
+import { IWorld } from "../src/codegen/world/IWorld.sol";
 
-contract ReleasePrize is Script {
-    function run(address worldAddress) external {
-        uint256 playerPk = vm.envUint("PLAYER_KEY");
-        address player = vm.addr(playerPk);
-        vm.startBroadcast(playerPk);
+import { Base_Script } from "./Base.s.sol";
+import { AreaControlLobby } from "../src/systems/area_control/AreaControlLobby.sol";
 
-        console.log("world address:", worldAddress);
-        console.log("player:", player);
-
-        // get ssu_id on env file
-        uint256 smartStorageUnitId = vm.envUint("SSU_ID");
-        console.log("smartStorageUnitId", smartStorageUnitId);
-
-        IAreaControlLobby(worldAddress).kothTestV10__acClaimPrize(
-            smartStorageUnitId
+contract ReleasePrize is Base_Script {
+    function _run(IWorld world) public override broadcastPlayer {
+        world.call(
+            lobbySystemId(),
+            abi.encodeCall(AreaControlLobby.acClaimPrize, (ssuIdLobby))
         );
-
-        vm.stopBroadcast();
     }
 }
