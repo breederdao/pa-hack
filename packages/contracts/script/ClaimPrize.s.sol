@@ -13,9 +13,18 @@ contract ClaimPrize is Base_Script {
         // get ssu_id on env file
         uint256 smartStorageUnitId = vm.envUint("SSU_ID");
 
-        world.call(
-            kothSystemId(),
-            abi.encodeCall(KingOfTheHill.claimPrize, (smartStorageUnitId))
+        // world.call(
+        //     kothSystemId(),
+        //     abi.encodeCall(
+        //         KingOfTheHill.claimPrize(uint256),
+        //         (smartStorageUnitId)
+        //     )
+        // );
+
+        bytes memory data = abi.encodeWithSelector(
+            bytes4(keccak256("claimPrize(uint256)")),
+            smartStorageUnitId
         );
+        world.call(kothSystemId(), data);
     }
 }
