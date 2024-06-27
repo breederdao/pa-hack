@@ -333,7 +333,9 @@ contract AreaControlLobby is System {
             uint256 startTime,
             bool isActive,
             bool claimed,
-            uint256 resetTime
+            uint256 resetTime,
+            uint256 expectedItemQuantity,
+            uint256 playerCount
         )
     {
         ACLobbyConfigData memory acLobbyConfigData = _getLobbyConfig(
@@ -347,7 +349,9 @@ contract AreaControlLobby is System {
             acLobbyStatusData.startTime,
             acLobbyStatusData.isActive,
             acLobbyStatusData.claimed,
-            acLobbyConfigData.lastResetTime
+            acLobbyConfigData.lastResetTime,
+            acLobbyConfigData.expectedItemQuantity,
+            acLobbyConfigData.playerCount
         );
     }
 
