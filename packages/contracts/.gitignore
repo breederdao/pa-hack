@@ -9,4 +9,3 @@ broadcast/
 deploys/**/*.json
 src/codegen/
 .env
-./script/
