@@ -16,7 +16,7 @@ contract ResetGame is Base_Script {
 
         world.call(
             kothSystemId(),
-            abi.encodeCall(KingOfTheHill.resetGame, (smartStorageUnitId, _initItemQuantity));
+            abi.encodeCall(KingOfTheHill.resetGame, (smartStorageUnitId, _initItemQuantity)));
         );
     }
 
